@@ -1,3 +1,6 @@
 [submodule "firmware/Libraries/Timer"]
 	path = firmware/Libraries/Timer
 	url = git@github.com:JChristensen/Timer.git
+[submodule "firmware/Libraries/Encoder"]
+	path = firmware/Libraries/Encoder
+	url = git@github.com:PaulStoffregen/Encoder.git
