@@ -33,7 +33,7 @@ Then install the Arduino IDE for Linux
 ## What to expect
 
 - Run roscore: `roscore`
-- Run this to forware Arduino message: `rosrun rosserial_python serial_node.py /dev/ttyACM0`
+- Run this to forware Arduino message: `roslaunch aruino_node ros_serial.launch`
     - You may need to change the serial port name (The name can be seen in Arduino IDE)
 - Move the wheel and see: `rostopic echo encoder`
 
