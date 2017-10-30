@@ -2,7 +2,9 @@
 
 IMUReader::IMUReader()
         : pub("imu", &euler_msg)
-{
+{}
+
+void IMUReader::realInit(){
     if(!imu.begin())
     {
         Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");

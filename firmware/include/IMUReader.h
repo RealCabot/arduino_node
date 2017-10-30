@@ -15,6 +15,7 @@ class IMUReader : public SensorReader{
 public:
     ros::Publisher pub;
     IMUReader();
+    void realInit();
     void update();
     void publish(ros::NodeHandle &nh);
 };

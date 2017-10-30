@@ -27,8 +27,8 @@ Then install the Arduino IDE for Linux
 
 ### Compile and upload
 
-- Compile the firmware: `catkin_make arduino_node_firmware_arduinoEncoder`
-- Upload the firmware: `catkin_make arduino_node_firmware_arduinoEncoder-upload`
+- Compile the firmware: `catkin_make arduino_node_firmware_oneForAll`
+- Upload the firmware: `catkin_make arduino_node_firmware_oneForAll-upload`
 
 ## What to expect
 
