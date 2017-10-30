@@ -18,7 +18,7 @@ void setup()
 {
   Serial.begin(9600);
   nh.initNode();
-  nh.advertise(myEncoderReader.velocity_pub);
+  nh.advertise(myEncoderReader.pub);
   t.every(delay_time, readAndPublishVelocity);
 }
 

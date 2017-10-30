@@ -1,13 +1,8 @@
-//
-// Created by yanda on 10/28/17.
-//
-
 #include "EncoderReader.h"
 
 EncoderReader::EncoderReader(short pinA, short pinB)
-        : velocity_pub("encoder", &encoder_msg)
+        : pub("encoder", &encoder_msg)
         , myEnc(pinA, pinB)
-        , oldPosition(-999)
 {}
 
 void EncoderReader::update(){
@@ -24,5 +19,5 @@ void EncoderReader::update(){
 void EncoderReader::publish(ros::NodeHandle &nh){
     this->encoder_msg.speed = speed;
     this->encoder_msg.header.stamp = nh.now();
-    this->velocity_pub.publish( &encoder_msg );
+    this->pub.publish( &encoder_msg );
 }

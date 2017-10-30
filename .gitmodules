@@ -4,3 +4,9 @@
 [submodule "firmware/Libraries/Encoder"]
 	path = firmware/Libraries/Encoder
 	url = git@github.com:PaulStoffregen/Encoder.git
+[submodule "firmware/Libraries/Adafruit_BNO055"]
+	path = firmware/Libraries/Adafruit_BNO055
+	url = git@github.com:adafruit/Adafruit_BNO055.git
+[submodule "firmware/Libraries/Adafruit_Sensor"]
+	path = firmware/Libraries/Adafruit_Sensor
+	url = git@github.com:adafruit/Adafruit_Sensor.git
