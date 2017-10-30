@@ -20,10 +20,10 @@ void readAndPublishVelocityHeading();
 void setup()
 {
   Serial.begin(9600);
-  myIMUReader.realInit();
+  // myIMUReader.realInit();
   nh.initNode();
-  nh.advertise(myEncoderReader.pub);
-  nh.advertise(myIMUReader.pub);
+  nh.advertise(myEncoderReader.get_publisher());
+  // nh.advertise(myIMUReader.get_publisher());
   t.every(delay_time, readAndPublishVelocityHeading);
 }
 
@@ -35,8 +35,8 @@ void loop()
 void readAndPublishVelocityHeading()
 {
   myEncoderReader.update();
-  myIMUReader.update();
+  // myIMUReader.update();
   myEncoderReader.publish(nh);
-  myIMUReader.publish(nh);
+  // myIMUReader.publish(nh);
   nh.spinOnce();
 }

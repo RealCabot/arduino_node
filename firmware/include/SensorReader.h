@@ -5,9 +5,15 @@
 #include <Arduino.h>
 
 class SensorReader {
+protected:
+    ros::Publisher pub;
 public:
+    SensorReader(const char * topic_name, ros::Msg * msg)
+        :pub(topic_name, msg)
+    {}
     virtual void update()=0;
     virtual void publish(ros::NodeHandle &nh)=0;
+    ros::Publisher& get_publisher(){return pub;}
 };
 
 

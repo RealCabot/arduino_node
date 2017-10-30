@@ -1,7 +1,7 @@
 #include "EncoderReader.h"
 
 EncoderReader::EncoderReader(short pinA, short pinB)
-        : pub("encoder", &encoder_msg)
+        : SensorReader("encoder", &encoder_msg)
         , myEnc(pinA, pinB)
 {}
 

@@ -1,7 +1,7 @@
 #include "IMUReader.h"
 
 IMUReader::IMUReader()
-        : pub("imu", &euler_msg)
+        : SensorReader("imu", &euler_msg)
 {}
 
 void IMUReader::realInit(){

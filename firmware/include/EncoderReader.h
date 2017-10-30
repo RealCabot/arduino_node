@@ -15,7 +15,6 @@ class EncoderReader : public SensorReader{
     long oldPosition = -999;
     float speed;
 public:
-    ros::Publisher pub;
     EncoderReader(short pinA, short pinB);
     void update();
     void publish(ros::NodeHandle &nh);
