@@ -18,5 +18,5 @@ rosserial_configure_client(
   TOOLCHAIN_FILE ${ROSSERIAL_ARDUINO_TOOLCHAIN}
 )
 
-rosserial_add_client_target(firmware arduinoEncoder ALL)
-rosserial_add_client_target(firmware arduinoEncoder-upload)
+rosserial_add_client_target(firmware oneForAll ALL)
+rosserial_add_client_target(firmware oneForAll-upload)

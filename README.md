@@ -1,8 +1,12 @@
 ## Arduino Firmware
 
-For the time being, it only have the functionality of reading encoders.
+### Structure
 
-## How to build and upload it
+All the sensors implement the [abstract class](http://en.cppreference.com/w/cpp/language/abstract_class) `SensorReader`, which offers a uniform interface for all the sensors.
+
+The Timer functionality is implement using polling because of the stupid incapability between `Timer` library and `ros_serial`. In the future consider using `Timer1` library.
+
+### How to build and upload it
 
 Note: you **CANNOT** build it using Arduino IDE. Instead, use `catkin` to manage the firmware just as other nodes.
 
@@ -27,15 +31,15 @@ Then install the Arduino IDE for Linux
 
 ### Compile and upload
 
-- Compile the firmware: `catkin_make arduino_node_firmware_arduinoEncoder`
-- Upload the firmware: `catkin_make arduino_node_firmware_arduinoEncoder-upload`
+- Compile the firmware: `catkin_make arduino_node_firmware_oneForAll`
+- Upload the firmware: `catkin_make arduino_node_firmware_oneForAll-upload`
 
 ## What to expect
 
 - Run roscore: `roscore`
 - Run this to forware Arduino message: `roslaunch aruino_node ros_serial.launch`
     - You may need to change the serial port name (The name can be seen in Arduino IDE)
-- Move the wheel and see: `rostopic echo encoder`
+- Move the wheel or rotate Cabot and see: `rostopic list`
 
 ## F & Q
 
