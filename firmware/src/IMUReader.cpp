@@ -5,10 +5,11 @@ IMUReader::IMUReader()
 {}
 
 void IMUReader::realInit(){
-    if(!imu.begin())
-    {
-        Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    }
+    // if(!imu.begin())
+    // {
+    //     Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    // }
+    imu.begin();
     delay(1000);
     imu.setExtCrystalUse(true);
 }

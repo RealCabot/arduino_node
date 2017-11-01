@@ -1,11 +1,10 @@
 #include <ros.h>
 #include <Arduino.h>
-#include <Timer.h>
 #include "EncoderReader.h"
 #include "IMUReader.h"
 
 ros::NodeHandle nh;
-Timer t;
+unsigned long timer;
 
 const int delay_time = 1000 / ENCODER_FREQ;
 #define HEARTBEAT_CYCLE 500
@@ -15,7 +14,7 @@ const int delay_time = 1000 / ENCODER_FREQ;
 #define LED_PIN 13
 
 EncoderReader myEncoderReader(ENCODER_PIN_A, ENCODER_PIN_B);
-// IMUReader myIMUReader;
+IMUReader myIMUReader;
 
 void heartbeat();
 void readAndPublishVelocityHeading();
@@ -24,25 +23,26 @@ void setup()
 {
   Serial.begin(57600);
   pinMode(LED_PIN, OUTPUT);
-  // myIMUReader.realInit();
+  myIMUReader.realInit();
   nh.initNode();
   nh.advertise(myEncoderReader.get_publisher());
-  // nh.advertise(myIMUReader.get_publisher());
-  t.every(delay_time, readAndPublishVelocityHeading);
-  t.every(HEARTBEAT_CYCLE, heartbeat);
+  nh.advertise(myIMUReader.get_publisher());
 }
 
 void loop()
 {
-  t.update();
+  if ( (millis()-timer) > delay_time){
+    readAndPublishVelocityHeading();
+    timer =  millis();
+  }
 }
 
 void readAndPublishVelocityHeading()
 {
   myEncoderReader.update();
-  // myIMUReader.update();
+  myIMUReader.update();
   myEncoderReader.publish(nh);
-  // myIMUReader.publish(nh);
+  myIMUReader.publish(nh);
   nh.spinOnce();
 }
 
