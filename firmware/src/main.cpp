@@ -7,16 +7,13 @@ ros::NodeHandle nh;
 unsigned long timer;
 
 const int delay_time = 1000 / ENCODER_FREQ;
-#define HEARTBEAT_CYCLE 500
 
 #define ENCODER_PIN_A 2
 #define ENCODER_PIN_B 3
-#define LED_PIN 13
 
 EncoderReader myEncoderReader(ENCODER_PIN_A, ENCODER_PIN_B);
 IMUReader myIMUReader;
 
-void heartbeat();
 void readAndPublishVelocityHeading();
 
 void setup()
@@ -44,11 +41,4 @@ void readAndPublishVelocityHeading()
   myEncoderReader.publish(nh);
   myIMUReader.publish(nh);
   nh.spinOnce();
-}
-
-void heartbeat(){
-  static int status = HIGH;
-  digitalWrite(LED_PIN, status);
-  Serial.println(status);
-  status = (status== HIGH)? LOW:HIGH;
 }
