@@ -10,9 +10,12 @@ The Timer functionality is implement using polling because of the stupid incapab
 
 Note: you **CANNOT** build it using Arduino IDE. Instead, use `catkin` to manage the firmware just as other nodes.
 
+
 ### Install dependencies
 
 ```
+Clone arduino_msg node repo (included in Real Cabot organization) into your catkin workspace.
+ 
 sudo apt-get install ros-kinetic-rosserial-arduino
 sudo apt-get install ros-kinetic-rosserial
 ```
