@@ -13,9 +13,8 @@ Note: you **CANNOT** build it using Arduino IDE. Instead, use `catkin` to manage
 
 ### Install dependencies
 
-```
 Clone arduino_msg node repo (included in Real Cabot organization) into your catkin workspace.
- 
+``` 
 sudo apt-get install ros-kinetic-rosserial-arduino
 sudo apt-get install ros-kinetic-rosserial
 ```
