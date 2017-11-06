@@ -12,12 +12,13 @@
 class EncoderReader : public SensorReader{
     arduino_msg::Encoder encoder_msg;
     Encoder myEnc;
-    long oldPosition = -999;
-    float speed;
+    long oldPosition = 0;
+
 public:
     EncoderReader(short pinA, short pinB);
     void update();
     void publish(ros::NodeHandle &nh);
+    float speed;
 };
 
 
