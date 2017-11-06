@@ -11,19 +11,19 @@ const int delay_time = 1000 / ENCODER_FREQ;
 
 #define RENCODER_PIN_A 2
 #define RENCODER_PIN_B 3
-#define LENCODER_PIN_A 7
-#define LENCODER_PIN_B 8
+#define LENCODER_PIN_A 18
+#define LENCODER_PIN_B 19
 #define RMOTA 10
 #define RMOTB 11
-#define RPWM  12
+//#define RPWM  12
 #define LMOTA 5
 #define LMOTB 6
-#define LPWM  9
+//#define LPWM  9
 
 int LOOPTIME=100;
 unsigned long lastMilli = 0;
-int Rspeed_req = 300;
-int Lspeed_reg = 300;
+int Rspeed_req = 180;
+int Lspeed_reg = 180;
 int Rspeed_act = 0;
 int Lspeed_req = 0;
 int Lspeed_act = 0;
@@ -56,20 +56,24 @@ void setup()
   pinMode(RMOTB, OUTPUT);
   pinMode(LMOTA, OUTPUT);
   pinMode(LMOTB, OUTPUT);
-  pinMode(RPWM, OUTPUT);
-  pinMode(LPWM, OUTPUT);
+  //pinMode(RPWM, OUTPUT);
+  //pinMode(LPWM, OUTPUT);
 
 }
 
 void loop()
 {
+
   if ( (millis()-timer) > delay_time){
     readAndPublishVelocityHeading();
     timer =  millis();
+      //Serial.print("fuck ros");
   }
 
   Rspeed_act = myREncoderReader.speed;
+  Rspeed_act = Rspeed_act;
   Lspeed_act = myLEncoderReader.speed;
+
   // ostringstream try1;
   // try1<<Rspeed_act;
   // try2=try1.str();
@@ -77,9 +81,10 @@ void loop()
   //const char *try1 = const char*(Rspeed_act);
 
   //String hello = "hello";
-  nh.loginfo("hello"); //nh.loginfo(try2); //nh.loginfo();
+  //nh.loginfo("hello"); //nh.loginfo(try2); //nh.loginfo();
 
-   printf("hello, %d", Rspeed_act);
+   //printf("hello, %d", Rspeed_act);
+    //Serial.println(Rspeed_act);
 
 
   if (abs(Rspeed_req) > 0){
@@ -91,17 +96,17 @@ void loop()
   }
 
   if (Rspeed_req < 0){
-    digitalWrite(RMOTA, HIGH);
-    digitalWrite(RMOTB, LOW);
+    analogWrite(RMOTA, 0);
+    analogWrite(RMOTB, PWM_valR);
 
   }
   else if(Rspeed_req > 0){
-    digitalWrite(RMOTA, LOW);
-    digitalWrite(RMOTB, HIGH);
+    analogWrite(RMOTA, PWM_valR);
+    analogWrite(RMOTB, 0);
 
   }
 
-  analogWrite(RPWM, PWM_valR);
+
 
 }
 
@@ -115,7 +120,10 @@ void readAndPublishVelocityHeading()
 }
 
 void getMotorData() {
-  Rspeed_act = (myREncoderReader.speed*(60*(1000/LOOPTIME)))/(1200); //1200 counts per revolution for output shaft
+  static long countAnt = 0;
+  Rspeed_act = myREncoderReader.speed*(60*1000/LOOPTIME); //1200 counts per revolution for output shaft
+  countAnt = count;
+
 }
 
 int updatePID(int command, int targetVal, int curVal, double Kp, double Kd, double Ki){
