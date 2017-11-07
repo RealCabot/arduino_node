@@ -5,7 +5,7 @@
 #include <Encoder.h>
 #include "SensorReader.h"
 
-#define ENCODER_FREQ 5 // How many times in a second
+#define ENCODER_FREQ 10 // How many times in a second
 #define RESET_THRESHOLD 2000000000 // Close to Arduino Long limit. It's actually 2,147,483,647
 #define TICK_PER_METER 14123 //How many ticks does it take for the robot to go 1m
 

@@ -20,18 +20,19 @@ const int delay_time = 1000 / ENCODER_FREQ;
 #define LMOTB 6
 //#define LPWM  9
 
-int LOOPTIME=100;
+float LOOPTIME=.5;
 unsigned long lastMilli = 0;
-int Rspeed_req = 180;
+//int Rspeed_req = 180;
+float Rspeed_req = 1;
 int Lspeed_reg = 180;
-int Rspeed_act = 0;
+float Rspeed_act = 0;
 int Lspeed_req = 0;
 int Lspeed_act = 0;
 int PWM_valR = 0;
 int PWM_valL = 0;
 
 //PID
-double RKp=50, RKi=2, RKd=30, LKp=50, LKi=2, LKd=30;
+int RKp=800, RKi=0, RKd=0, LKp=50, LKi=2, LKd=30;
 
 using namespace std;
 
@@ -41,7 +42,7 @@ EncoderReader myLEncoderReader(LENCODER_PIN_A, LENCODER_PIN_B);
 
 void readAndPublishVelocityHeading();
 int updatePID(int command, int targetVal, int curVal, double Kp, double Ki, double Kd);
-
+int PIDtry2(float desiredSpeed, float currSpeed);
 void setup()
 {
   Serial.begin(57600);
@@ -58,7 +59,6 @@ void setup()
   pinMode(LMOTB, OUTPUT);
   //pinMode(RPWM, OUTPUT);
   //pinMode(LPWM, OUTPUT);
-
 }
 
 void loop()
@@ -71,8 +71,9 @@ void loop()
   }
 
   Rspeed_act = myREncoderReader.speed;
-  Rspeed_act = Rspeed_act;
-  Lspeed_act = myLEncoderReader.speed;
+  //Serial.println(Rspeed_act);
+  //Rspeed_act = Rspeed_act;
+  //Lspeed_act = myLEncoderReader.speed;
 
   // ostringstream try1;
   // try1<<Rspeed_act;
@@ -90,7 +91,9 @@ void loop()
   if (abs(Rspeed_req) > 0){
     if((millis()-lastMilli) >= LOOPTIME){
       lastMilli = millis();
-      PWM_valR = updatePID(PWM_valR, Rspeed_req, Rspeed_act, RKp, RKi, RKd);
+      //PWM_valR = updatePID(PWM_valR, Rspeed_req, Rspeed_act, RKp, RKi, RKd);
+      // Serial.println(Rspeed_act);
+      PWM_valR = PIDtry2(Rspeed_req, Rspeed_act);
 
     }
   }
@@ -106,8 +109,6 @@ void loop()
 
   }
 
-
-
 }
 
 void readAndPublishVelocityHeading()
@@ -119,23 +120,48 @@ void readAndPublishVelocityHeading()
   nh.spinOnce();
 }
 
-void getMotorData() {
-  static long countAnt = 0;
-  Rspeed_act = myREncoderReader.speed*(60*1000/LOOPTIME); //1200 counts per revolution for output shaft
-  countAnt = count;
+// void getMotorData() {
+//   static long countAnt = 0;
+//   Rspeed_act = myREncoderReader.speed*(60*1000/LOOPTIME); //1200 counts per revolution for output shaft
+//   countAnt = count;
 
-}
+// }
 
-int updatePID(int command, int targetVal, int curVal, double Kp, double Kd, double Ki){
-  float pidTerm = 0;
-  int error = 0;
-  int toterror = 0;
-  static int last_error = 0;
-  error = abs(targetVal) - abs(curVal);
-  toterror += error;
-  pidTerm = (Kp+error) + (Kd*(error - last_error)) + (Ki * (toterror));
-  last_error = error;
+//code based on: https://tutorial.cytron.io/2012/06/22/pid-for-embedded-design/
+//return PWM. If pwm is positive, direction = forward. If PWM is negative, direction = reverse 
+int PIDtry2(float desiredSpeed, float currSpeed){
+  static float integral = 0;
+  static float lastError = 0;
 
-  return (command + int(pidTerm));
+   //calc error
+  float error = desiredSpeed - currSpeed;
+   //accumulate error in integral 
+  integral += error; 
+  float derivative = error - lastError;
 
-}
+  //calc control variable for RIGHT motor
+  int pwm = (RKp * error) + (RKi * integral) + (RKd * derivative);
+
+   //limit pwm to range: [-255, 255]
+  if (pwm < -255) pwm = -255;
+  if (pwm > 255)  pwm = 255;
+
+  lastError = error; //save last error 
+  Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
+
+  return pwm;
+} 
+
+// int updatePID(int command, int targetVal, int curVal, double Kp, double Kd, double Ki){
+//   float pidTerm = 0;
+//   int error = 0;
+//   int toterror = 0;
+//   static int last_error = 0;
+//   error = abs(targetVal) - abs(curVal);
+//   toterror += error;
+//   pidTerm = (Kp+error) + (Kd*(error - last_error)) + (Ki * (toterror));
+//   last_error = error;
+
+//   return (command + int(pidTerm));
+
+// }
