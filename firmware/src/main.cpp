@@ -22,27 +22,29 @@ const int delay_time = 1000 / ENCODER_FREQ;
 
 float LOOPTIME=.5;
 unsigned long lastMilli = 0;
-//int Rspeed_req = 180;
-float Rspeed_req = 1;
-int Lspeed_reg = 180;
+float Rspeed_req = .2;
 float Rspeed_act = 0;
-int Lspeed_req = 0;
-int Lspeed_act = 0;
+float Lspeed_req = .6;
+float Lspeed_act = 0;
 int PWM_valR = 0;
 int PWM_valL = 0;
+//int Lspeed_reg = 180;
+//int Rspeed_req = 180;
 
 //PID
-int RKp=800, RKi=0, RKd=0, LKp=50, LKi=2, LKd=30;
+int RKp=30, RKi=5, RKd=10, LKp=50, LKi=2, LKd=30;
 
-using namespace std;
+//using namespace std;
 
 EncoderReader myREncoderReader(RENCODER_PIN_A, RENCODER_PIN_B);
 EncoderReader myLEncoderReader(LENCODER_PIN_A, LENCODER_PIN_B);
 //IMUReader myIMUReader;
 
 void readAndPublishVelocityHeading();
-int updatePID(int command, int targetVal, int curVal, double Kp, double Ki, double Kd);
-int PIDtry2(float desiredSpeed, float currSpeed);
+//int updatePID(int command, int targetVal, int curVal, double Kp, double Ki, double Kd);
+int PIDtryR(float desiredSpeed, float currSpeed);
+int PIDtryL(float desiredSpeed, float currSpeed);
+
 void setup()
 {
   Serial.begin(57600);
@@ -66,11 +68,15 @@ void loop()
 
   if ( (millis()-timer) > delay_time){
     readAndPublishVelocityHeading();
+    
+    Rspeed_act = myREncoderReader.speed;
+    Lspeed_act = myLEncoderReader.speed;
+    Serial.println( Lspeed_act );
     timer =  millis();
-      //Serial.print("fuck ros");
+
   }
 
-  Rspeed_act = myREncoderReader.speed;
+
   //Serial.println(Rspeed_act);
   //Rspeed_act = Rspeed_act;
   //Lspeed_act = myLEncoderReader.speed;
@@ -88,12 +94,13 @@ void loop()
     //Serial.println(Rspeed_act);
 
 
-  if (abs(Rspeed_req) > 0){
+  if (abs(Rspeed_req) && abs(Lspeed_req)){
     if((millis()-lastMilli) >= LOOPTIME){
       lastMilli = millis();
       //PWM_valR = updatePID(PWM_valR, Rspeed_req, Rspeed_act, RKp, RKi, RKd);
       // Serial.println(Rspeed_act);
-      PWM_valR = PIDtry2(Rspeed_req, Rspeed_act);
+      PWM_valR = PIDtryR(Rspeed_req, Rspeed_act);
+      PWM_valL = PIDtryL(Lspeed_req, Lspeed_act);
 
     }
   }
@@ -101,14 +108,22 @@ void loop()
   if (Rspeed_req < 0){
     analogWrite(RMOTA, 0);
     analogWrite(RMOTB, PWM_valR);
-
   }
-  else if(Rspeed_req > 0){
+
+  if(Rspeed_req > 0){
     analogWrite(RMOTA, PWM_valR);
     analogWrite(RMOTB, 0);
-
   }
 
+  if (Lspeed_req < 0){
+      analogWrite(LMOTA, 0);
+      analogWrite(LMOTB, PWM_valL);
+  }
+
+  if(Lspeed_req > 0){
+      analogWrite(LMOTA, PWM_valL);
+      analogWrite(LMOTB, 0);
+  }
 }
 
 void readAndPublishVelocityHeading()
@@ -129,7 +144,7 @@ void readAndPublishVelocityHeading()
 
 //code based on: https://tutorial.cytron.io/2012/06/22/pid-for-embedded-design/
 //return PWM. If pwm is positive, direction = forward. If PWM is negative, direction = reverse 
-int PIDtry2(float desiredSpeed, float currSpeed){
+int PIDtryR(float desiredSpeed, float currSpeed){
   static float integral = 0;
   static float lastError = 0;
 
@@ -147,7 +162,30 @@ int PIDtry2(float desiredSpeed, float currSpeed){
   if (pwm > 255)  pwm = 255;
 
   lastError = error; //save last error 
-  Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
+  Serial.print("R: "); Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
+
+  return pwm;
+} 
+
+int PIDtryL(float desiredSpeed, float currSpeed){
+  static float integral = 0;
+  static float lastError = 0;
+
+   //calc error
+  float error = desiredSpeed - currSpeed;
+   //accumulate error in integral 
+  integral += error; 
+  float derivative = error - lastError;
+
+  //calc control variable for RIGHT motor
+  int pwm = (LKp * error) + (LKi * integral) + (LKd * derivative);
+
+   //limit pwm to range: [-255, 255]
+  if (pwm < -255) pwm = -255;
+  if (pwm > 255)  pwm = 255;
+
+  lastError = error; //save last error 
+  Serial.print("L: "); Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
 
   return pwm;
 } 
