@@ -4,6 +4,7 @@
 #include "IMUReader.h"
 #include "Motor.h"
 #include <arduino_msg/Motor.h>
+#include <geometry_msgs/Vector3.h>
 
 ros::NodeHandle nh;
 Timer t;
@@ -23,8 +24,8 @@ const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 #define MOTOR_LEFT_PIN_B 5
 #define LED_PIN 13
 
-float speed_req_R = 0.6;
-float speed_req_L = 0.2;
+float speed_req_R = 0;
+float speed_req_L = 0;
 
 //PID
 const int RKp=30, RKi=5, RKd=10, LKp=50, LKi=2, LKd=30;
@@ -44,21 +45,26 @@ void heartbeat();
 void updateSensors();
 void motorControl();
 void encoders_publish();
+void setMotorSpeed(const arduino_msg::Motor& speed_msg);
+void setPIDParam(const geometry_msgs::Vector3& pid_param_msg);
 
 arduino_msg::Motor speed_msg;
 ros::Publisher encoder_publisher("encoder", &speed_msg);
+ros::Subscriber<arduino_msg::Motor> motor_speed_sub("motorSpeed", &setMotorSpeed);
+ros::Subscriber<geometry_msgs::Vector3> pid_param_sub("tunePID", &setPIDParam);
 
 void setup()
 {
   Serial.begin(57600);
   
-  //myIMUReader.realInit();
+  myIMUReader.realInit();
 
   nh.initNode();
 
   nh.advertise(encoder_publisher);
-  //nh.advertise(myIMUReader.get_publisher());
-
+  nh.advertise(myIMUReader.get_publisher());
+  nh.subscribe(motor_speed_sub);
+  nh.subscribe(pid_param_sub);
   //motor settings
   pinMode(MOTOR_RIGHT_PIN_A, OUTPUT);
   pinMode(MOTOR_RIGHT_PIN_B, OUTPUT);
@@ -73,6 +79,7 @@ void setup()
 
 void loop()
 {
+  nh.spinOnce();  
   t.update();
 }
 
@@ -85,9 +92,9 @@ void updateSensors()
 {
   motor_L.encoder.update();
   motor_R.encoder.update();
-  //myIMUReader.update();
+  myIMUReader.update();
   encoders_publish();
-  //myIMUReader.publish(nh);
+  myIMUReader.publish(nh);
   nh.spinOnce();
 }
 
@@ -102,4 +109,14 @@ void encoders_publish(){
   speed_msg.right_speed = motor_R.encoder.speed;
   speed_msg.header.stamp = nh.now();
   encoder_publisher.publish( &speed_msg );
+}
+
+void setMotorSpeed(const arduino_msg::Motor& speed_msg){
+  speed_req_L = speed_msg.left_speed;
+  speed_req_R = speed_msg.right_speed;
+}
+
+void setPIDParam(const geometry_msgs::Vector3& pid_param_msg){
+  motor_L.pid.setParam(pid_param_msg.x, pid_param_msg.y, pid_param_msg.z);
+  motor_R.pid.setParam(pid_param_msg.x, pid_param_msg.y, pid_param_msg.z);
 }

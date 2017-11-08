@@ -8,8 +8,8 @@
 class Motor {
     short pinA;
     short pinB;
-    PID pid;
 public:
+    PID pid;
     EncoderReader encoder;        
     Motor(
         short motor_pinA, short motor_pinB,

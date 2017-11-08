@@ -32,3 +32,9 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
 
     return pwm;
 }
+
+void PID::setParam(int Kp, int Ki, int Kd){
+    this->Kp = Kp;
+    this->Ki = Ki;
+    this->Kd = Kd;
+}
