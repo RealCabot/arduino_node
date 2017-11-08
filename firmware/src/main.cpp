@@ -1,43 +1,43 @@
 #include <ros.h>
 #include <Arduino.h>
 #include <Timer.h>
-#include "EncoderReader.h"
 #include "IMUReader.h"
-#include "PID.h"
+#include "Motor.h"
 
 ros::NodeHandle nh;
 Timer t;
 
-const int PID_DELAY = 1000 / PID_FREQ
+const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
+
 #define HEARTBEAT_CYCLE 500
 
 #define ENCODER_RIGHT_PIN_A 2
 #define ENCODER_RIGHT_PIN_B 3
 #define ENCODER_LEFT_PIN_A 18
 #define ENCODER_LEFT_PIN_B 19
-#define RMOTA 10
-#define RMOTB 11
-#define LMOTA 5
-#define LMOTB 6
+#define MOTOR_RIGHT_PIN_A 10
+#define MOTOR_RIGHT_PIN_B 11
+#define MOTOR_LEFT_PIN_A 6
+#define MOTOR_LEFT_PIN_B 5
 #define LED_PIN 13
 
-float LOOPTIME= 10; 
-unsigned long lastMilli = 0;
-float Rspeed_req = .6;
-float Rspeed_act = 0;
-float Lspeed_req = .2;
-float Lspeed_act = 0;
-int PWM_valR = 0;
-int PWM_valL = 0;
+float speed_req_R = 0.6;
+float speed_req_L = 0.2;
 
 //PID
-int RKp=30, RKi=5, RKd=10, LKp=50, LKi=2, LKd=30;
+const int RKp=30, RKi=5, RKd=10, LKp=50, LKi=2, LKd=30;
 
-EncoderReader myREncoderReader(ENCODER_RIGHT_PIN_A, ENCODER_RIGHT_PIN_B);
-EncoderReader myLEncoderReader(ENCODER_LEFT_PIN_A, ENCODER_LEFT_PIN_B);
-PID rightPID(RKp, RKi, RKd);
-PID leftPID(LKp, LKi, LKd);
+Motor motor_L(
+  MOTOR_LEFT_PIN_A, MOTOR_LEFT_PIN_B,
+  ENCODER_LEFT_PIN_A, ENCODER_LEFT_PIN_B,
+  LKp, LKi, LKd
+);
+Motor motor_R(
+  MOTOR_RIGHT_PIN_A, MOTOR_RIGHT_PIN_B,
+  ENCODER_RIGHT_PIN_A, ENCODER_RIGHT_PIN_B,
+  RKp, RKi, RKd
+);
 
 void heartbeat();
 void updateSensors();
@@ -51,20 +51,21 @@ void setup()
 
   nh.initNode();
 
-  nh.advertise(myREncoderReader.get_publisher());
-  nh.advertise(myLEncoderReader.get_publisher());
+  //TODO: do not let them publish on the same ROS topic
+  nh.advertise(motor_L.encoder.get_publisher());
+  nh.advertise(motor_R.encoder.get_publisher());
   //nh.advertise(myIMUReader.get_publisher());
 
   //motor settings
-  pinMode(RMOTA, OUTPUT);
-  pinMode(RMOTB, OUTPUT);
-  pinMode(LMOTA, OUTPUT);
-  pinMode(LMOTB, OUTPUT);
+  pinMode(MOTOR_RIGHT_PIN_A, OUTPUT);
+  pinMode(MOTOR_RIGHT_PIN_B, OUTPUT);
+  pinMode(MOTOR_LEFT_PIN_A, OUTPUT);
+  pinMode(MOTOR_LEFT_PIN_B, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
 
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
-  t.every(1000/LOOPTIME, motorControl);
+  t.every(PID_DELAY, motorControl);
 }
 
 void loop()
@@ -73,38 +74,17 @@ void loop()
 }
 
 void motorControl(){
-  Rspeed_act = myREncoderReader.speed;
-  Lspeed_act = myLEncoderReader.speed;
-  PWM_valR = rightPID.update(Rspeed_req, Rspeed_act);
-  PWM_valL = leftPID.update(Lspeed_req, Lspeed_act);
-  if (Rspeed_req < 0){
-    analogWrite(RMOTA, 0);
-    analogWrite(RMOTB, PWM_valR);
-  }
-
-  if(Rspeed_req > 0){
-    analogWrite(RMOTA, PWM_valR);
-    analogWrite(RMOTB, 0);
-  }
-
-  if (Lspeed_req < 0){
-    analogWrite(LMOTA, PWM_valL);
-    analogWrite(LMOTB, 0);
-  }
-  if(Lspeed_req > 0){
-
-    analogWrite(LMOTA, 0);
-    analogWrite(LMOTB, PWM_valL);
-  }
+  motor_L.go(speed_req_L);
+  motor_R.go(speed_req_R);
 }
 
 void updateSensors()
 {
-  myREncoderReader.update();
-  myLEncoderReader.update();
+  motor_L.encoder.update();
+  motor_R.encoder.update();
   //myIMUReader.update();
-  myREncoderReader.publish(nh);
-  myLEncoderReader.publish(nh);
+  motor_L.encoder.publish(nh);
+  motor_R.encoder.publish(nh);
   //myIMUReader.publish(nh);
   nh.spinOnce();
 }

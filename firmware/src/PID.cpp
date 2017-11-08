@@ -4,13 +4,13 @@
 
 #include "PID.h"
 
-PID::PID(int Kp, int Ki, int Kd){
-    this-> Kp = Kp;
-    this-> Ki = Ki;
-    this-> Kd = Kd;
-}
+#define motorControl 10
 
-int PID::update(float desiredSpeed, float currSpeed){
+PID::PID(int Kp, int Ki, int Kd)
+    :Kp(Kp), Ki(Ki), Kd(Kd)
+{}
+
+int PID::getPWM(float desiredSpeed, float currSpeed){
     static float integral = 0;
     static float lastError = 0;
 

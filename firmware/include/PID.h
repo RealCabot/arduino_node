@@ -5,13 +5,13 @@
 #ifndef ARDUINO_NODE_PID_H
 #define ARDUINO_NODE_PID_H
 
+#define PID_FREQ 10
 
 class PID {
     int Kp, Ki, Kd;
-
 public:
     PID(int Kp, int Ki, int Kd);
-    int update(float desiredSpeed, float currSpeed);
+    int getPWM(float desiredSpeed, float currSpeed);
 };
 
 
