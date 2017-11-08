@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "EncoderReader.h"
 #include "IMUReader.h"
+#include "PID.h"
 // #include <sstream>
 
 ros::NodeHandle nh;
@@ -20,7 +21,7 @@ const int delay_time = 1000 / ENCODER_FREQ;
 #define LMOTB 6
 //#define LPWM  9
 
-float LOOPTIME=.5;
+float LOOPTIME= 10; 
 unsigned long lastMilli = 0;
 float Rspeed_req = .6;
 float Rspeed_act = 0;
@@ -38,12 +39,14 @@ int RKp=30, RKi=5, RKd=10, LKp=50, LKi=2, LKd=30;
 
 EncoderReader myREncoderReader(RENCODER_PIN_A, RENCODER_PIN_B);
 EncoderReader myLEncoderReader(LENCODER_PIN_A, LENCODER_PIN_B);
+PID rightPID(RKp, RKi, RKd);
+PID leftPID(LKp, LKi, LKd);
 //IMUReader myIMUReader;
 
 void readAndPublishVelocityHeading();
 //int updatePID(int command, int targetVal, int curVal, double Kp, double Ki, double Kd);
-int PIDtryR(float desiredSpeed, float currSpeed);
-int PIDtryL(float desiredSpeed, float currSpeed);
+//int PIDtryR(float desiredSpeed, float currSpeed);
+//int PIDtryL(float desiredSpeed, float currSpeed);
 
 void setup()
 {
@@ -99,8 +102,10 @@ void loop()
       lastMilli = millis();
       //PWM_valR = updatePID(PWM_valR, Rspeed_req, Rspeed_act, RKp, RKi, RKd);
       // Serial.println(Rspeed_act);
-      PWM_valR = PIDtryR(Rspeed_req, Rspeed_act);
-      PWM_valL = PIDtryL(Lspeed_req, Lspeed_act);
+//      PWM_valR = PIDtryR(Rspeed_req, Rspeed_act);
+//      PWM_valL = PIDtryL(Lspeed_req, Lspeed_act);
+        PWM_valR = rightPID.update(Rspeed_req, Rspeed_act);
+        PWM_valL = leftPID.update(Lspeed_req, Lspeed_act);
 
     }
   }
@@ -146,51 +151,51 @@ void readAndPublishVelocityHeading()
 
 //code based on: https://tutorial.cytron.io/2012/06/22/pid-for-embedded-design/
 //return PWM. If pwm is positive, direction = forward. If PWM is negative, direction = reverse 
-int PIDtryR(float desiredSpeed, float currSpeed){
-  static float integral = 0;
-  static float lastError = 0;
-
-   //calc error
-  float error = desiredSpeed - currSpeed;
-   //accumulate error in integral 
-  integral += error; 
-  float derivative = error - lastError;
-
-  //calc control variable for RIGHT motor
-  int pwm = (RKp * error) + (RKi * integral) + (RKd * derivative);
-
-   //limit pwm to range: [-255, 255]
-  if (pwm < -255) pwm = -255;
-  if (pwm > 255)  pwm = 255;
-
-  lastError = error; //save last error 
-  Serial.print("R: "); Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
-
-  return pwm;
-} 
-
-int PIDtryL(float desiredSpeed, float currSpeed){
-  static float integral = 0;
-  static float lastError = 0;
-
-   //calc error
-  float error = desiredSpeed - currSpeed;
-   //accumulate error in integral 
-  integral += error; 
-  float derivative = error - lastError;
-
-  //calc control variable for RIGHT motor
-  int pwm = (LKp * error) + (LKi * integral) + (LKd * derivative);
-
-   //limit pwm to range: [-255, 255]
-  if (pwm < -255) pwm = -255;
-  if (pwm > 255)  pwm = 255;
-
-  lastError = error; //save last error 
-  Serial.print("L: "); Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
-
-  return pwm;
-} 
+//int PIDtryR(float desiredSpeed, float currSpeed){
+//  static float integral = 0;
+//  static float lastError = 0;
+//
+//   //calc error
+//  float error = desiredSpeed - currSpeed;
+//   //accumulate error in integral
+//  integral += error;
+//  float derivative = error - lastError;
+//
+//  //calc control variable for RIGHT motor
+//  int pwm = (RKp * error) + (RKi * integral) + (RKd * derivative);
+//
+//   //limit pwm to range: [-255, 255]
+//  if (pwm < -255) pwm = -255;
+//  if (pwm > 255)  pwm = 255;
+//
+//  lastError = error; //save last error
+//  Serial.print("R: "); Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
+//
+//  return pwm;
+//}
+//
+//int PIDtryL(float desiredSpeed, float currSpeed){
+//  static float integral = 0;
+//  static float lastError = 0;
+//
+//   //calc error
+//  float error = desiredSpeed - currSpeed;
+//   //accumulate error in integral
+//  integral += error;
+//  float derivative = error - lastError;
+//
+//  //calc control variable for RIGHT motor
+//  int pwm = (LKp * error) + (LKi * integral) + (LKd * derivative);
+//
+//   //limit pwm to range: [-255, 255]
+//  if (pwm < -255) pwm = -255;
+//  if (pwm > 255)  pwm = 255;
+//
+//  lastError = error; //save last error
+//  Serial.print("L: "); Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);
+//
+//  return pwm;
+//}
 
 // int updatePID(int command, int targetVal, int curVal, double Kp, double Kd, double Ki){
 //   float pidTerm = 0;

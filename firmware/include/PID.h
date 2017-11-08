@@ -10,8 +10,8 @@ class PID {
     int Kp, Ki, Kd;
 
 public:
-    PID(int, int, int);
-    update(float, float);
+    PID(int Kp, int Ki, int Kd);
+    int update(float desiredSpeed, float currSpeed);
 };
 
 
