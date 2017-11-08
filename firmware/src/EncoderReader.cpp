@@ -16,6 +16,7 @@ void EncoderReader::update(){
     }
 }
 
+//Depricated
 void EncoderReader::publish(ros::NodeHandle &nh){
     this->encoder_msg.speed = speed;
     this->encoder_msg.header.stamp = nh.now();

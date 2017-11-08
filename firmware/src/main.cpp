@@ -3,6 +3,7 @@
 #include <Timer.h>
 #include "IMUReader.h"
 #include "Motor.h"
+#include <arduino_msg/Motor.h>
 
 ros::NodeHandle nh;
 Timer t;
@@ -42,6 +43,10 @@ Motor motor_R(
 void heartbeat();
 void updateSensors();
 void motorControl();
+void encoders_publish();
+
+arduino_msg::Motor speed_msg;
+ros::Publisher encoder_publisher("encoder", &speed_msg);
 
 void setup()
 {
@@ -51,9 +56,7 @@ void setup()
 
   nh.initNode();
 
-  //TODO: do not let them publish on the same ROS topic
-  nh.advertise(motor_L.encoder.get_publisher());
-  nh.advertise(motor_R.encoder.get_publisher());
+  nh.advertise(encoder_publisher);
   //nh.advertise(myIMUReader.get_publisher());
 
   //motor settings
@@ -83,8 +86,7 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   //myIMUReader.update();
-  motor_L.encoder.publish(nh);
-  motor_R.encoder.publish(nh);
+  encoders_publish();
   //myIMUReader.publish(nh);
   nh.spinOnce();
 }
@@ -93,4 +95,11 @@ void heartbeat(){
   static int status = HIGH;
   digitalWrite(LED_PIN, status);
   status = (status== HIGH)? LOW:HIGH;
+}
+
+void encoders_publish(){ 
+  speed_msg.left_speed = motor_L.encoder.speed;
+  speed_msg.right_speed = motor_R.encoder.speed;
+  speed_msg.header.stamp = nh.now();
+  encoder_publisher.publish( &speed_msg );
 }
