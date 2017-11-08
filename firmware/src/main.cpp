@@ -22,9 +22,9 @@ const int delay_time = 1000 / ENCODER_FREQ;
 
 float LOOPTIME=.5;
 unsigned long lastMilli = 0;
-float Rspeed_req = .2;
+float Rspeed_req = .6;
 float Rspeed_act = 0;
-float Lspeed_req = .6;
+float Lspeed_req = .2;
 float Lspeed_act = 0;
 int PWM_valR = 0;
 int PWM_valL = 0;
@@ -116,21 +116,23 @@ void loop()
   }
 
   if (Lspeed_req < 0){
-      analogWrite(LMOTA, 0);
-      analogWrite(LMOTB, PWM_valL);
+    analogWrite(LMOTA, PWM_valL);
+    analogWrite(LMOTB, 0);
   }
-
   if(Lspeed_req > 0){
-      analogWrite(LMOTA, PWM_valL);
-      analogWrite(LMOTB, 0);
+
+    analogWrite(LMOTA, 0);
+    analogWrite(LMOTB, PWM_valL);
   }
 }
 
 void readAndPublishVelocityHeading()
 {
   myREncoderReader.update();
+  myLEncoderReader.update();
   //myIMUReader.update();
   myREncoderReader.publish(nh);
+  myLEncoderReader.publish(nh);
   //myIMUReader.publish(nh);
   nh.spinOnce();
 }
