@@ -16,6 +16,6 @@ add_definitions(-DUSB_CON)
 generate_arduino_firmware(oneForAll
   SRCS src/main.cpp src/EncoderReader.cpp src/IMUReader.cpp ${ROS_LIB_DIR}/time.cpp
   HDRS include/EncoderReader.h include/IMUReader.h
-  BOARD uno
+  BOARD mega2560
   PORT /dev/ttyACM0
 )
