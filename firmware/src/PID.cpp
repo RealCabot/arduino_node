@@ -11,6 +11,11 @@ PID::PID(int Kp, int Ki, int Kd)
 {}
 
 int PID::getPWM(float desiredSpeed, float currSpeed){
+	if (desiredSpeed < 0)
+		desiredSpeed *= -1;
+	if (currSpeed < 0)
+		currSpeed *= -1;
+
     //calc error
     float error = desiredSpeed - currSpeed;
     //accumulate error in integral
@@ -20,8 +25,8 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
     //calc control variable for RIGHT motor
     int pwm = (Kp * error) + (Ki * integral) + (Kd * derivative);
 
-    //limit pwm to range: [-255, 255]
-    if (pwm < -255) pwm = -255;
+    //limit pwm to range: [0, 255]
+    if (pwm < 0) pwm = 0;
     if (pwm > 255)  pwm = 255;
 
     lastError = error; //save last error

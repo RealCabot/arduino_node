@@ -31,7 +31,7 @@ float speed_req_R = 0;
 float speed_req_L = 0;
 long motorUpdateTime = 0;
 //PID coefficients
-const int RKp=35, RKi=5, RKd=10, LKp=35, LKi=5, LKd=10;
+const int RKp=35, RKi=5, RKd=15, LKp=35, LKi=5, LKd=15;
 
 Motor motor_L(
   MOTOR_LEFT_PIN_A, MOTOR_LEFT_PIN_B,

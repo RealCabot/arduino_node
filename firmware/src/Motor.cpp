@@ -13,7 +13,7 @@ Motor::Motor(
 void Motor::go(float desiredSpeed){
     auto actual_speed = this->encoder.speed;
     auto PWM_val = this->pid.getPWM(desiredSpeed, actual_speed);
-    if (PWM_val < 0){
+    if (desiredSpeed < 0){
       analogWrite(pinA, 0);
       analogWrite(pinB, PWM_val);
     } else {
