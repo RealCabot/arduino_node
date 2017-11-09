@@ -11,6 +11,9 @@ Timer t;
 
 const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
+const int MOTOR_DELAY = 200; //used in motor timeout
+
+#define MOTOR_TIMEOUT 5000 //milliseconds
 
 #define HEARTBEAT_CYCLE 500
 
@@ -24,10 +27,10 @@ const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 #define MOTOR_LEFT_PIN_B   11
 #define LED_PIN 13
 
-float speed_req_R = 0.15;
-float speed_req_L = 0.15;
-
-//PID
+float speed_req_R = 0;
+float speed_req_L = 0;
+long motorUpdateTime = 0;
+//PID coefficients
 const int RKp=35, RKi=5, RKd=10, LKp=35, LKi=5, LKd=10;
 
 Motor motor_L(
@@ -41,12 +44,14 @@ Motor motor_R(
   RKp, RKi, RKd
 );
 
+IMUReader myIMUReader;
 void heartbeat();
 void updateSensors();
 void motorControl();
 void encoders_publish();
 void setMotorSpeed(const arduino_msg::Motor& speed_msg);
 void setPIDParam(const geometry_msgs::Vector3& pid_param_msg);
+void motorTimeout();
 
 arduino_msg::Motor speed_msg;
 ros::Publisher encoder_publisher("encoder", &speed_msg);
@@ -75,6 +80,7 @@ void setup()
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
   t.every(PID_DELAY, motorControl);
+  t.every(MOTOR_DELAY, motorTimeout);
 }
 
 void loop()
@@ -98,12 +104,14 @@ void updateSensors()
   nh.spinOnce();
 }
 
+ // blink LED periodically to indicate everything's gonna be alright
 void heartbeat(){
   static int status = HIGH;
   digitalWrite(LED_PIN, status);
   status = (status== HIGH)? LOW:HIGH;
 }
 
+ // publishes the left and right encoder speeds
 void encoders_publish(){ 
   speed_msg.left_speed = motor_L.encoder.speed;
   speed_msg.right_speed = motor_R.encoder.speed;
@@ -111,12 +119,25 @@ void encoders_publish(){
   encoder_publisher.publish( &speed_msg );
 }
 
+ // this callback sets the speed of the left and right motors
+ // subscribes to rostopic "motorSpeed"
 void setMotorSpeed(const arduino_msg::Motor& speed_msg){
   speed_req_L = speed_msg.left_speed;
   speed_req_R = speed_msg.right_speed;
+  motorUpdateTime = millis();
 }
 
+ // stop motors if it has been a while since receiving a motor command
+void motorTimeout(){
+  if ((millis() - motorUpdateTime) > MOTOR_TIMEOUT){
+    speed_req_R = 0;
+    speed_req_L = 0;
+  }
+}
+
+ // this callback sets PID coefficient. ONLY USED IN TUNING PARAMETERS
 void setPIDParam(const geometry_msgs::Vector3& pid_param_msg){
+  // X = proportional term, Y = integral term, Z = derivative term
   motor_L.pid.setParam(pid_param_msg.x, pid_param_msg.y, pid_param_msg.z);
   motor_R.pid.setParam(pid_param_msg.x, pid_param_msg.y, pid_param_msg.z);
 }
