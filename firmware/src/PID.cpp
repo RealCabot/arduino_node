@@ -11,9 +11,6 @@ PID::PID(int Kp, int Ki, int Kd)
 {}
 
 int PID::getPWM(float desiredSpeed, float currSpeed){
-    static float integral = 0;
-    static float lastError = 0;
-
     //calc error
     float error = desiredSpeed - currSpeed;
     //accumulate error in integral

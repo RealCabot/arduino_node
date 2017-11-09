@@ -24,11 +24,11 @@ const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 #define MOTOR_LEFT_PIN_B 5
 #define LED_PIN 13
 
-float speed_req_R = 0;
-float speed_req_L = 0;
+float speed_req_R = 0.15;
+float speed_req_L = 0.15;
 
 //PID
-const int RKp=30, RKi=5, RKd=10, LKp=50, LKi=2, LKd=30;
+const int RKp=35, RKi=5, RKd=10, LKp=35, LKi=5, LKd=10;
 
 Motor motor_L(
   MOTOR_LEFT_PIN_A, MOTOR_LEFT_PIN_B,
@@ -57,12 +57,12 @@ void setup()
 {
   Serial.begin(57600);
   
-  myIMUReader.realInit();
+  // myIMUReader.realInit();
 
   nh.initNode();
 
   nh.advertise(encoder_publisher);
-  nh.advertise(myIMUReader.get_publisher());
+  // nh.advertise(myIMUReader.get_publisher());
   nh.subscribe(motor_speed_sub);
   nh.subscribe(pid_param_sub);
   //motor settings
@@ -92,9 +92,9 @@ void updateSensors()
 {
   motor_L.encoder.update();
   motor_R.encoder.update();
-  myIMUReader.update();
+  // myIMUReader.update();
   encoders_publish();
-  myIMUReader.publish(nh);
+  // myIMUReader.publish(nh);
   nh.spinOnce();
 }
 
