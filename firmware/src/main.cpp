@@ -58,6 +58,7 @@ ros::Publisher encoder_publisher("encoder", &speed_msg);
 ros::Subscriber<arduino_msg::Motor> motor_speed_sub("motorSpeed", &setMotorSpeed);
 ros::Subscriber<geometry_msgs::Vector3> pid_param_sub("tunePID", &setPIDParam);
 
+
 void setup()
 {
   Serial.begin(57600);
@@ -81,6 +82,7 @@ void setup()
   t.every(HEARTBEAT_CYCLE, heartbeat);
   t.every(PID_DELAY, motorControl);
   t.every(MOTOR_DELAY, motorTimeout);
+
 }
 
 void loop()
