@@ -19,7 +19,6 @@ void readAndPublishVelocityHeading();
 void setup()
 {
   Serial.begin(57600);
-  pinMode(LED_PIN, OUTPUT);
   myIMUReader.realInit();
   nh.initNode();
   nh.advertise(myEncoderReader.get_publisher());
