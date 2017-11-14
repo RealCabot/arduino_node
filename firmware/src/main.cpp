@@ -13,7 +13,7 @@ const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 const int MOTOR_DELAY = 200; //used in motor timeout
 
-#define MAX_SPEED 0.67		//maximum motorspeed
+#define MAX_SPEED 0.67		//maximum motorspeed in m/s
 #define MOTOR_TIMEOUT 5000  //milliseconds
 
 #define HEARTBEAT_CYCLE 500
@@ -129,6 +129,7 @@ void setMotorSpeed(const arduino_msg::Motor& speed_msg){
   speed_req_L = constrain(speed_msg.left_speed, -MAX_SPEED, MAX_SPEED);
   speed_req_R = constrain(speed_msg.right_speed, -MAX_SPEED, MAX_SPEED);
   motorUpdateTime = millis();  //record last time motors received speeds
+
 }
 
  // stop motors if it has been a while since receiving a motor command
@@ -139,7 +140,7 @@ void motorTimeout(){
   }
 }
 
- // this callback sets PID coefficient. ONLY USED FOR TUNING PARAMETERS
+ // this callback sets PID coefficient. ONLY USED IN TUNING PARAMETERS
 void setPIDParam(const geometry_msgs::Vector3& pid_param_msg){
   // X = proportional term, Y = integral term, Z = derivative term
   motor_L.pid.setParam(pid_param_msg.x, pid_param_msg.y, pid_param_msg.z);
