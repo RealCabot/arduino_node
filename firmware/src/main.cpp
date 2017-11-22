@@ -13,7 +13,7 @@ const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 const int MOTOR_DELAY = 200; //used in motor timeout
 
-#define MAX_SPEED 0.67		//maximum motorspeed in m/s
+#define MAX_SPEED 0.2		//maximum motorspeed in m/s
 #define MOTOR_TIMEOUT 5000  //milliseconds
 
 #define HEARTBEAT_CYCLE 500
@@ -64,12 +64,12 @@ void setup()
 {
   Serial.begin(57600);
   
-  // myIMUReader.realInit();
+  myIMUReader.realInit();
 
   nh.initNode();
 
   nh.advertise(encoder_publisher);
-  // nh.advertise(myIMUReader.get_publisher());
+  nh.advertise(myIMUReader.get_publisher());
   nh.subscribe(motor_speed_sub);
   nh.subscribe(pid_param_sub);
   //motor settings
@@ -101,9 +101,9 @@ void updateSensors()
 {
   motor_L.encoder.update();
   motor_R.encoder.update();
-  // myIMUReader.update();
+  myIMUReader.update();
   encoders_publish();
-  // myIMUReader.publish(nh);
+  myIMUReader.publish(nh);
   nh.spinOnce();
 }
 

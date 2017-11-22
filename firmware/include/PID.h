@@ -5,6 +5,8 @@
 #ifndef ARDUINO_NODE_PID_H
 #define ARDUINO_NODE_PID_H
 
+#include <Arduino.h>
+
 #define PID_FREQ 100
 
 class PID {
