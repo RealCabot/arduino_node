@@ -1,7 +1,7 @@
 //
 // Created by andrew on 11/7/17.
 //
-
+#include <stdlib.h>
 #include "PID.h"
 
 #define motorControl 10
