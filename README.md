@@ -46,8 +46,8 @@ git submodule update --init --recursive
 
 Then install the Arduino IDE for Linux
 
-## F & Q
+## FAQ
 
 - It builds successfully but won't upload
-    - First check that the port name is `/dev/ttyACM0`, if not, edit the `PORT` part in `firmware/CMakeList.txt`.
+    - First check that the port name is `/dev/ttyACM0`, if not, edit the `PORT` part in `firmware/CMakeList.txt`and "port" value in launch/ros_serial.launch to `/dev/ttyACM0`
     - Unplug the USB, plug it back and try again.
