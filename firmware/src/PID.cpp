@@ -1,10 +1,12 @@
 //
 // Created by andrew on 11/7/17.
 //
-
+#include <stdlib.h>
 #include "PID.h"
 
 #define motorControl 10
+#define MAX_I 300
+#define MAX_PWM 120 //are u happy Yanda??
 
 PID::PID(int Kp, int Ki, int Kd)
     :Kp(Kp), Ki(Ki), Kd(Kd)
@@ -20,14 +22,15 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
     float error = desiredSpeed - currSpeed;
     //accumulate error in integral
     integral += error;
+    integral = constrain(integral, -MAX_I, MAX_I);
+
     float derivative = error - lastError;
 
     //calc control variable for RIGHT motor
     int pwm = (Kp * error) + (Ki * integral) + (Kd * derivative);
 
     //limit pwm to range: [0, 255]
-    if (pwm < 0) pwm = 0;
-    if (pwm > 255)  pwm = 255;
+    pwm = constrain(pwm, 0, MAX_PWM);
 
     lastError = error; //save last error
     //Serial.print("L: "); Serial.print(pwm); Serial.print("\t"); Serial.println(currSpeed);

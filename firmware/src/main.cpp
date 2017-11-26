@@ -13,7 +13,8 @@ const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 const int MOTOR_DELAY = 200; //used in motor timeout
 
-#define MOTOR_TIMEOUT 5000 //milliseconds
+#define MAX_SPEED 0.2		//maximum motorspeed in m/s
+#define MOTOR_TIMEOUT 5000  //milliseconds
 
 #define HEARTBEAT_CYCLE 500
 
@@ -31,7 +32,7 @@ float speed_req_R = 0;
 float speed_req_L = 0;
 long motorUpdateTime = 0;
 //PID coefficients
-const int RKp=35, RKi=5, RKd=15, LKp=35, LKi=5, LKd=15;
+const int RKp=35, RKi=20, RKd=15, LKp=35, LKi=20, LKd=15;
 
 Motor motor_L(
   MOTOR_LEFT_PIN_A, MOTOR_LEFT_PIN_B,
@@ -63,12 +64,12 @@ void setup()
 {
   Serial.begin(57600);
   
-  // myIMUReader.realInit();
+  myIMUReader.realInit();
 
   nh.initNode();
 
   nh.advertise(encoder_publisher);
-  // nh.advertise(myIMUReader.get_publisher());
+  nh.advertise(myIMUReader.get_publisher());
   nh.subscribe(motor_speed_sub);
   nh.subscribe(pid_param_sub);
   //motor settings
@@ -100,9 +101,9 @@ void updateSensors()
 {
   motor_L.encoder.update();
   motor_R.encoder.update();
-  // myIMUReader.update();
+  myIMUReader.update();
   encoders_publish();
-  // myIMUReader.publish(nh);
+  myIMUReader.publish(nh);
   nh.spinOnce();
 }
 
@@ -124,9 +125,11 @@ void encoders_publish(){
  // this callback sets the speed of the left and right motors
  // subscribes to rostopic "motorSpeed"
 void setMotorSpeed(const arduino_msg::Motor& speed_msg){
-  speed_req_L = speed_msg.left_speed;
-  speed_req_R = speed_msg.right_speed;
-  motorUpdateTime = millis();
+	//constrain motor speeds
+  speed_req_L = constrain(speed_msg.left_speed, -MAX_SPEED, MAX_SPEED);
+  speed_req_R = constrain(speed_msg.right_speed, -MAX_SPEED, MAX_SPEED);
+  motorUpdateTime = millis();  //record last time motors received speeds
+
 }
 
  // stop motors if it has been a while since receiving a motor command

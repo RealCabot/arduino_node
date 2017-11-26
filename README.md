@@ -20,7 +20,7 @@ catkin_make arduino_node_firmware_oneForAll-upload
     - You may need to change the serial port name (The name can be seen in Arduino IDE)
 - Published:
     - `/encoder`: the speed information of motor, using `arduino_msg::Motor`
-    - `/imu`: absolute pose information, suing `geometry_msg::Vector3Stamped`
+    - `/imu`: absolute pose information, using `geometry_msg::Vector3Stamped`
 - Subscribed:
     - `/motorSpeed`: set the motor desired speed.
         - You can publish in terminal like this: `rostopic pub /motorSpeed arduino_msg/Motor '{left_speed: 0.4, right_speed: 0}' -1`
@@ -46,8 +46,9 @@ git submodule update --init --recursive
 
 Then install the Arduino IDE for Linux
 
-## F & Q
+## FAQ
 
 - It builds successfully but won't upload
-    - First check that the port name is `/dev/ttyACM0`, if not, edit the `PORT` part in `firmware/CMakeList.txt`.
+    - First check that the port name is `/dev/ttyACM0`, if not, edit the `PORT` part in `firmware/CMakeList.txt` AND change the `port` value in `launch/ros_serial.launch` to `/dev/ttyACM0`
     - Unplug the USB, plug it back and try again.
+    
