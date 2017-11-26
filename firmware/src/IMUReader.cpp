@@ -16,12 +16,14 @@ void IMUReader::realInit(){
 void IMUReader::update(){
     sensors_event_t event;
     this->imu.getEvent(&event);
-    euler_msg.vector.x = event.orientation.x;
+    //apply coordinate transform: pi - theta
+    euler_msg.vector.x = 180 - event.orientation.x; 
     euler_msg.vector.y = event.orientation.y;
     euler_msg.vector.z = event.orientation.z;
 }
 
 void IMUReader::publish(ros::NodeHandle &nh){
     this->euler_msg.header.stamp = nh.now();
+
     this->pub.publish( &euler_msg );
 }

@@ -5,8 +5,8 @@
 #include "PID.h"
 
 #define motorControl 10
-#define MAX_I 300
-#define MAX_PWM 120 //are u happy Yanda??
+#define MAX_I 100
+#define MAX_PWM 150 //are u happy Yanda??
 
 PID::PID(int Kp, int Ki, int Kd)
     :Kp(Kp), Ki(Ki), Kd(Kd)
@@ -22,8 +22,10 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
     float error = desiredSpeed - currSpeed;
     //accumulate error in integral
     integral += error;
-    integral = constrain(integral, -MAX_I, MAX_I);
-
+    //integral = constrain(integral, -MAX_I, MAX_I);
+    if (integral > MAX_I || integral < -MAX_I){
+        integral = 0;
+    }
     float derivative = error - lastError;
 
     //calc control variable for RIGHT motor
