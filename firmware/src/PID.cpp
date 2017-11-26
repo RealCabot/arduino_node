@@ -20,12 +20,13 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
 
     //calc error
     float error = desiredSpeed - currSpeed;
+
     //accumulate error in integral
-    integral += error;
-    //integral = constrain(integral, -MAX_I, MAX_I);
-    if (integral > MAX_I || integral < -MAX_I){
-        integral = 0;
+    if (!(desiredSpeed > 0 && abs(currSpeed)<0.0001)){
+        integral += error;
+        integral = constrain(integral, -MAX_I, MAX_I);
     }
+
     float derivative = error - lastError;
 
     //calc control variable for RIGHT motor
