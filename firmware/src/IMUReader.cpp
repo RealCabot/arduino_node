@@ -1,5 +1,15 @@
 #include "IMUReader.h"
 
+static float angle_constrain(float angle){
+    while (angle > 180) {
+        angle -= 360;
+    }
+    while (angle < -180) {
+    	angle +=360;
+    }
+   	return angle;
+}
+
 IMUReader::IMUReader()
         : SensorReader("imu", &euler_msg)
 {}
@@ -17,7 +27,7 @@ void IMUReader::update(){
     sensors_event_t event;
     this->imu.getEvent(&event);
     //apply coordinate transform: pi - theta
-    euler_msg.vector.x = 180 - event.orientation.x; 
+    euler_msg.vector.x = angle_constrain(180 - event.orientation.x); 
     euler_msg.vector.y = event.orientation.y;
     euler_msg.vector.z = event.orientation.z;
 }
