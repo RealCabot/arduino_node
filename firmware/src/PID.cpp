@@ -6,7 +6,7 @@
 
 #define motorControl 10
 #define MAX_I 100
-#define MAX_PWM 150 //are u happy Yanda??
+#define MAX_PWM 255 //are u happy Yanda??
 
 PID::PID(int Kp, int Ki, int Kd)
     :Kp(Kp), Ki(Ki), Kd(Kd)

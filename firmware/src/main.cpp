@@ -13,7 +13,6 @@ const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 const int MOTOR_DELAY = 200; //used in motor timeout
 
-#define MAX_SPEED 0.2		//maximum motorspeed in m/s
 #define MOTOR_TIMEOUT 5000  //milliseconds
 
 #define HEARTBEAT_CYCLE 500
@@ -126,8 +125,8 @@ void encoders_publish(){
  // subscribes to rostopic "motorSpeed"
 void setMotorSpeed(const arduino_msg::Motor& speed_msg){
 	//constrain motor speeds
-  speed_req_L = constrain(speed_msg.left_speed, -MAX_SPEED, MAX_SPEED);
-  speed_req_R = constrain(speed_msg.right_speed, -MAX_SPEED, MAX_SPEED);
+  speed_req_L = speed_msg.left_speed;
+  speed_req_R = speed_msg.right_speed;
   motorUpdateTime = millis();  //record last time motors received speeds
 
 }
