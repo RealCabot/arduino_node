@@ -3,6 +3,7 @@
 //
 #include <stdlib.h>
 #include "PID.h"
+#include "ros.h"
 
 #define motorControl 10
 #define MAX_I 100
@@ -22,15 +23,20 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
     float error = desiredSpeed - currSpeed;
 
     //accumulate error in integral
-    if (!(desiredSpeed > 0 && abs(currSpeed)<0.0001)){
-        integral += error;
-        integral = constrain(integral, -MAX_I, MAX_I);
-    }
-
+    // if (!(desiredSpeed > 0 && abs(currSpeed)<0.0001)){
+    //     integral += error;
+    //     integral = constrain(integral, -MAX_I, MAX_I);
+    // }
+    integral += error;
+    integral = constrain(integral, -MAX_I, MAX_I);
     float derivative = error - lastError;
 
     //calc control variable for RIGHT motor
     int pwm = (Kp * error) + (Ki * integral) + (Kd * derivative);
+    pwm = constrain(pwm, 0, MAX_PWM);
+    ros::NodeHandle nh;
+    char cstr[16];
+    nh.loginfo(itoa(pwm, cstr, 10));
 
     //limit pwm to range: [0, 255]
     pwm = constrain(pwm, 0, MAX_PWM);
