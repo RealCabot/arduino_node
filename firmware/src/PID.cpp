@@ -14,6 +14,7 @@ PID::PID(int Kp, int Ki, int Kd)
 {}
 
 int PID::getPWM(float desiredSpeed, float currSpeed){
+    ros::NodeHandle nh;
 	if (desiredSpeed < 0)
 		desiredSpeed *= -1;
 	if (currSpeed < 0)
@@ -22,21 +23,29 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
     //calc error
     float error = desiredSpeed - currSpeed;
 
+        char cstr[50];
+        char d_str[6];
+        char curr_str[6];
+
+        /* 4 is mininum width, 2 is precision; float value is copied onto str_temp*/
+        // dtostrf(desiredSpeed, 4, 2, d_str);
+        // dtostrf(currSpeed, 4, 2, curr_str);
+        // sprintf(cstr, "desired speed: %s, currSpeed: %s", d_str, curr_str);
+        // nh.loginfo(cstr);
+
     //accumulate error in integral
-    // if (!(desiredSpeed > 0 && abs(currSpeed)<0.0001)){
-    //     integral += error;
-    //     integral = constrain(integral, -MAX_I, MAX_I);
-    // }
-    integral += error;
+    if (!(desiredSpeed > 0 && abs(currSpeed)<0.001)){
+        integral += error;
+    }
     integral = constrain(integral, -MAX_I, MAX_I);
+
     float derivative = error - lastError;
 
     //calc control variable for RIGHT motor
     int pwm = (Kp * error) + (Ki * integral) + (Kd * derivative);
-    pwm = constrain(pwm, 0, MAX_PWM);
-    ros::NodeHandle nh;
-    char cstr[16];
-    nh.loginfo(itoa(pwm, cstr, 10));
+    // ros::NodeHandle nh;
+    // char cstr[16];
+    // nh.loginfo(itoa(pwm, cstr, 10));
 
     //limit pwm to range: [0, 255]
     pwm = constrain(pwm, 0, MAX_PWM);
