@@ -62,8 +62,6 @@ ros::Subscriber<geometry_msgs::Vector3> pid_param_sub("tunePID", &setPIDParam);
 void setup()
 {
   Serial.begin(57600);
-  
-  myIMUReader.realInit();
 
   nh.initNode();
 
@@ -77,6 +75,14 @@ void setup()
   pinMode(MOTOR_LEFT_PIN_A, OUTPUT);
   pinMode(MOTOR_LEFT_PIN_B, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
+
+  while(!nh.connected()) {nh.spinOnce();}
+
+  float imu_offset = 180; //Default value
+  if (! nh.getParam("~imu_offset", &imu_offset)){ 
+    nh.logwarn("IMU offset not set. Using default value 180.");
+  }
+  myIMUReader.realInit(imu_offset);
 
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
