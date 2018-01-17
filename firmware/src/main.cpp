@@ -13,7 +13,6 @@ const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 const int MOTOR_DELAY = 200; //used in motor timeout
 
-#define MAX_SPEED 0.2		//maximum motorspeed in m/s
 #define MOTOR_TIMEOUT 5000  //milliseconds
 
 #define HEARTBEAT_CYCLE 500
@@ -32,7 +31,7 @@ float speed_req_R = 0;
 float speed_req_L = 0;
 long motorUpdateTime = 0;
 //PID coefficients
-const int RKp=35, RKi=20, RKd=15, LKp=35, LKi=20, LKd=15;
+const int RKp=35, RKi=16, RKd=15, LKp=35, LKi=16, LKd=15;
 
 Motor motor_L(
   MOTOR_LEFT_PIN_A, MOTOR_LEFT_PIN_B,
@@ -63,8 +62,6 @@ ros::Subscriber<geometry_msgs::Vector3> pid_param_sub("tunePID", &setPIDParam);
 void setup()
 {
   Serial.begin(57600);
-  
-  myIMUReader.realInit();
 
   nh.initNode();
 
@@ -78,6 +75,14 @@ void setup()
   pinMode(MOTOR_LEFT_PIN_A, OUTPUT);
   pinMode(MOTOR_LEFT_PIN_B, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
+
+  while(!nh.connected()) {nh.spinOnce();}
+
+  float imu_offset = 180; //Default value
+  if (! nh.getParam("~imu_offset", &imu_offset)){ 
+    nh.logwarn("IMU offset not set. Using default value 180.");
+  }
+  myIMUReader.realInit(imu_offset);
 
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
@@ -126,8 +131,8 @@ void encoders_publish(){
  // subscribes to rostopic "motorSpeed"
 void setMotorSpeed(const arduino_msg::Motor& speed_msg){
 	//constrain motor speeds
-  speed_req_L = constrain(speed_msg.left_speed, -MAX_SPEED, MAX_SPEED);
-  speed_req_R = constrain(speed_msg.right_speed, -MAX_SPEED, MAX_SPEED);
+  speed_req_L = speed_msg.left_speed;
+  speed_req_R = speed_msg.right_speed;
   motorUpdateTime = millis();  //record last time motors received speeds
 
 }

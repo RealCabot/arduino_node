@@ -10,9 +10,10 @@
 class IMUReader : public SensorReader{
     Adafruit_BNO055 imu = Adafruit_BNO055(55);
     geometry_msgs::Vector3Stamped euler_msg;
+    float initial_offset;
 public:
     IMUReader();
-    void realInit();
+    void realInit(float initial_offset = 180);
     void update();
     void publish(ros::NodeHandle &nh);
 };
