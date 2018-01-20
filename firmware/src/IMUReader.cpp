@@ -14,12 +14,11 @@ IMUReader::IMUReader()
         : SensorReader("imu", &euler_msg)
 {}
 
-void IMUReader::realInit(float initial_offset){
+void IMUReader::realInit(){
     if(!imu.begin())
     {
         Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     }
-    this->initial_offset = initial_offset;
     delay(1000);
     imu.setExtCrystalUse(true);
 }
@@ -28,7 +27,7 @@ void IMUReader::update(){
     sensors_event_t event;
     this->imu.getEvent(&event);
     //apply coordinate transform: pi - theta
-    euler_msg.vector.x = angle_constrain(initial_offset - event.orientation.x); 
+    euler_msg.vector.x = angle_constrain(event.orientation.x); 
     euler_msg.vector.y = event.orientation.y;
     euler_msg.vector.z = event.orientation.z;
 }

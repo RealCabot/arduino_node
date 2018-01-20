@@ -82,7 +82,7 @@ void setup()
   if (! nh.getParam("~imu_offset", &imu_offset)){ 
     nh.logwarn("IMU offset not set. Using default value 180.");
   }
-  myIMUReader.realInit(imu_offset);
+  myIMUReader.realInit();
 
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
