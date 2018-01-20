@@ -78,10 +78,6 @@ void setup()
 
   while(!nh.connected()) {nh.spinOnce();}
 
-  float imu_offset = 180; //Default value
-  if (! nh.getParam("~imu_offset", &imu_offset)){ 
-    nh.logwarn("IMU offset not set. Using default value 180.");
-  }
   myIMUReader.realInit();
 
   t.every(SENSOR_DELAY, updateSensors);
