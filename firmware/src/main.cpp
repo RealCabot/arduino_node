@@ -5,7 +5,7 @@
 #include "Motor.h"
 #include <arduino_msg/Motor.h>
 #include <geometry_msgs/Vector3.h>
-
+#include "Touch.h"
 ros::NodeHandle nh;
 Timer t;
 
@@ -45,6 +45,7 @@ Motor motor_R(
 );
 
 IMUReader myIMUReader;
+Touch touchReader;  //MPR121 touch sensor
 void heartbeat();
 void updateSensors();
 void motorControl();
@@ -107,6 +108,7 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
+    touchReader.update();
   encoders_publish();
   myIMUReader.publish(nh);
   nh.spinOnce();

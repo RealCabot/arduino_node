@@ -14,8 +14,8 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
 add_definitions(-DUSB_CON)
 
 generate_arduino_firmware(oneForAll
-  SRCS src/main.cpp src/EncoderReader.cpp src/IMUReader.cpp src/PID.cpp src/Motor.cpp ${ROS_LIB_DIR}/time.cpp
-  HDRS include/EncoderReader.h include/IMUReader.h include/Motor.h
+  SRCS src/main.cpp src/EncoderReader.cpp src/IMUReader.cpp src/PID.cpp src/Motor.cpp src/Touch.cpp ${ROS_LIB_DIR}/time.cpp
+  HDRS include/EncoderReader.h include/IMUReader.h include/Motor.h include/Touch.h
   BOARD mega2560
   PORT /dev/ttyACM0
 )
