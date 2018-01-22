@@ -15,7 +15,7 @@ class Touch : public SensorReader{
 
 public:
     Touch();
-    void init();
+    int init();
     void update();
     void publish(ros::NodeHandle &nh);
 };

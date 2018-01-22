@@ -68,6 +68,7 @@ void setup()
 
   nh.advertise(encoder_publisher);
   nh.advertise(myIMUReader.get_publisher());
+    nh.advertise(touchReader.get_publisher());
   nh.subscribe(motor_speed_sub);
   nh.subscribe(pid_param_sub);
   //motor settings
@@ -84,7 +85,9 @@ void setup()
     nh.logwarn("IMU offset not set. Using default value 180.");
   }
   myIMUReader.realInit(imu_offset);
-
+  if (touchReader.init() == -1){
+      nh.logwarn("Error initializing touch sensor (MPR121) - is it wired correctly?");
+  }
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
   t.every(PID_DELAY, motorControl);
@@ -108,9 +111,10 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
-    touchReader.update();
+    //touchReader.update();
   encoders_publish();
   myIMUReader.publish(nh);
+  //touchReader.publish(nh);
   nh.spinOnce();
 }
 
