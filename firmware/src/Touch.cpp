@@ -12,10 +12,6 @@ int Touch::init(){
 //
     // Default address is 0x5A, if tied to 3.3V its 0x5B
     // If tied to SDA its 0x5C and if SCL then 0x5D
-//    bool yourFucked = true;
-//    if (yourFucked){
-//        Serial.println("Yeah I'm fucked");
-//    }
     if (!cap.begin(0x5A)) {     //TODO: THIS LINE IS CAUSING PROGRAM TO HANG
         Serial.println("MPR121 not found, check wiring?");
         return -1;

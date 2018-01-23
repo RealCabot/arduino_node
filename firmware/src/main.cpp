@@ -81,6 +81,8 @@ void setup()
   while(!nh.connected()) {nh.spinOnce();}
 
   float imu_offset = 180; //Default value
+    nh.loginfo("MAKE SURE TOUCH SENSOR (MPR121) IS CONNECTED!! OTHERWISE ARDUINO WILL CRASH!!");
+  
   if (! nh.getParam("~imu_offset", &imu_offset)){ 
     nh.logwarn("IMU offset not set. Using default value 180.");
   }
@@ -111,10 +113,10 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
-    //touchReader.update();
+    touchReader.update();
   encoders_publish();
   myIMUReader.publish(nh);
-  //touchReader.publish(nh);
+  touchReader.publish(nh);
   nh.spinOnce();
 }
 
