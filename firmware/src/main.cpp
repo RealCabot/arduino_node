@@ -5,6 +5,7 @@
 #include "Motor.h"
 #include <arduino_msg/Motor.h>
 #include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/Twist.h>
 #include "Touch.h"
 ros::NodeHandle nh;
 Timer t;
@@ -26,6 +27,7 @@ const int MOTOR_DELAY = 200; //used in motor timeout
 #define MOTOR_LEFT_PIN_A   10
 #define MOTOR_LEFT_PIN_B   11
 #define LED_PIN 13
+#define CABOT_WIDTH 0.225
 
 float speed_req_R = 0;
 float speed_req_L = 0;
@@ -50,13 +52,14 @@ void heartbeat();
 void updateSensors();
 void motorControl();
 void encoders_publish();
-void setMotorSpeed(const arduino_msg::Motor& speed_msg);
+void setMotorSpeed(const geometry_msgs::Twist& twist_msg);
 void setPIDParam(const geometry_msgs::Vector3& pid_param_msg);
 void motorTimeout();
 
 arduino_msg::Motor speed_msg;
 ros::Publisher encoder_publisher("encoder", &speed_msg);
-ros::Subscriber<arduino_msg::Motor> motor_speed_sub("motorSpeed", &setMotorSpeed);
+//ros::Subscriber<arduino_msg::Motor> motor_speed_sub("motorSpeed", &setMotorSpeed);
+ros::Subscriber<geometry_msgs::Twist> motor_twist_sub("cmd_vel", &setMotorSpeed);
 ros::Subscriber<geometry_msgs::Vector3> pid_param_sub("tunePID", &setPIDParam);
 
 
@@ -68,8 +71,8 @@ void setup()
 
   nh.advertise(encoder_publisher);
   nh.advertise(myIMUReader.get_publisher());
-    nh.advertise(touchReader.get_publisher());
-  nh.subscribe(motor_speed_sub);
+  nh.advertise(touchReader.get_publisher());
+  nh.subscribe(motor_twist_sub);
   nh.subscribe(pid_param_sub);
   //motor settings
   pinMode(MOTOR_RIGHT_PIN_A, OUTPUT);
@@ -113,7 +116,7 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
-    touchReader.update();
+  touchReader.update();
   encoders_publish();
   myIMUReader.publish(nh);
   touchReader.publish(nh);
@@ -137,13 +140,22 @@ void encoders_publish(){
 
  // this callback sets the speed of the left and right motors
  // subscribes to rostopic "motorSpeed"
-void setMotorSpeed(const arduino_msg::Motor& speed_msg){
-	//constrain motor speeds
-  speed_req_L = speed_msg.left_speed;
-  speed_req_R = speed_msg.right_speed;
+// void setMotorSpeed(const arduino_msg::Motor& speed_msg){
+// 	//constrain motor speeds
+//   speed_req_L = speed_msg.left_speed;
+//   speed_req_R = speed_msg.right_speed;
+//   motorUpdateTime = millis();  //record last time motors received speeds
+
+// }
+
+void setMotorSpeed(const geometry_msgs::Twist& twist_msg){
+  //constrain motor speeds
+  speed_req_L = twist_msg.linear.x - (twist_msg.angular.z * CABOT_WIDTH/2);
+  speed_req_R = twist_msg.linear.x + (twist_msg.angular.z * CABOT_WIDTH/2);
   motorUpdateTime = millis();  //record last time motors received speeds
 
 }
+
 
  // stop motors if it has been a while since receiving a motor command
 void motorTimeout(){
