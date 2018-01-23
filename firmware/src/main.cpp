@@ -111,10 +111,10 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
-    //touchReader.update();
+    touchReader.update();
   encoders_publish();
   myIMUReader.publish(nh);
-  //touchReader.publish(nh);
+  touchReader.publish(nh);
   nh.spinOnce();
 }
 
