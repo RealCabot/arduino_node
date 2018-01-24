@@ -85,13 +85,8 @@ void setup()
 
   while(!nh.connected()) {nh.spinOnce();}
 
-  float imu_offset = 180; //Default value
-    nh.loginfo("MAKE SURE TOUCH SENSOR (MPR121) IS CONNECTED!! OTHERWISE ARDUINO WILL CRASH!!");
-  
-  if (! nh.getParam("~imu_offset", &imu_offset)){ 
-    nh.logwarn("IMU offset not set. Using default value 180.");
-  }
-  myIMUReader.realInit(imu_offset);
+  nh.loginfo("MAKE SURE TOUCH SENSOR (MPR121) IS CONNECTED!! OTHERWISE ARDUINO WILL CRASH!!");
+  myIMUReader.realInit();
   if (touchReader.init() == -1){
       nh.logwarn("Error initializing touch sensor (MPR121) - is it wired correctly?");
   }
@@ -142,14 +137,6 @@ void encoders_publish(){
 
  // this callback sets the speed of the left and right motors
  // subscribes to rostopic "motorSpeed"
-// void setMotorSpeed(const arduino_msg::Motor& speed_msg){
-// 	//constrain motor speeds
-//   speed_req_L = speed_msg.left_speed;
-//   speed_req_R = speed_msg.right_speed;
-//   motorUpdateTime = millis();  //record last time motors received speeds
-
-// }
-
 void setMotorSpeed(const geometry_msgs::Twist& twist_msg){
   //constrain motor speeds, and only change speed if user is touching handle, and motor commands haven't timed out
   if (canGo){
