@@ -30,6 +30,7 @@ const int TOUCH_PIN = 5; //pin that touch pad is connected to on MPR121
 #define LED_PIN 13
 #define CABOT_WIDTH 0.225 //in meters
 
+bool touchPresent = false;  //true if MPR121 is detected
 bool canGo = false;
 float speed_req_R = 0;
 float speed_req_L = 0;
@@ -73,7 +74,6 @@ void setup()
 
   nh.advertise(encoder_publisher);
   nh.advertise(myIMUReader.get_publisher());
-  nh.advertise(touchReader.get_publisher());
   nh.subscribe(motor_twist_sub);
   nh.subscribe(pid_param_sub);
   //motor settings
@@ -85,10 +85,14 @@ void setup()
 
   while(!nh.connected()) {nh.spinOnce();}
 
-  nh.loginfo("MAKE SURE TOUCH SENSOR (MPR121) IS CONNECTED!! OTHERWISE ARDUINO WILL CRASH!!");
   myIMUReader.realInit();
-  if (touchReader.init() == -1){
-      nh.logwarn("Error initializing touch sensor (MPR121) - is it wired correctly?");
+
+  touchPresent = touchReader.init();
+  if (!touchPresent){
+      nh.logerror("Error initializing touch sensor (MPR121) - is it wired correctly?");
+  }
+  else{ //success, so initialize publisher
+    //nh.advertise(touchReader.get_publisher());
   }
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
@@ -113,10 +117,11 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
-  //touchReader.update();
   encoders_publish();
   myIMUReader.publish(nh);
-  touchReader.publish(nh);
+//  if (touchPresent){
+//    touchReader.publish(nh);
+//  }
   nh.spinOnce();
 }
 
@@ -148,7 +153,7 @@ void setMotorSpeed(const geometry_msgs::Twist& twist_msg){
 
 //stop CaBot if user lets go of handle or if Arduino hasn't received command in a while
 void checkMotors(){
-  bool isTouched = touchReader.getTouched(TOUCH_PIN);   //is user touching handle?
+  bool isTouched = (touchPresent) ? touchReader.getTouched(TOUCH_PIN) : false;   //is user touching handle?
   bool timeOut = (millis() - motorUpdateTime) > MOTOR_TIMEOUT; //have motors received command recently?
 
   canGo = isTouched && !timeOut;
@@ -157,13 +162,14 @@ void checkMotors(){
     speed_req_L = 0;
   }
 
-  if (isTouched){
-    nh.loginfo("TOUCHED");
+  if (touchPresent){
+    if (isTouched){
+      nh.loginfo("TOUCHED");
+    }
+    else{
+      nh.loginfo("RELEASED");
+    }
   }
-  else{
-    nh.loginfo("RELEASED");
-  }
-
 }
 
  // this callback sets PID coefficient. ONLY USED IN TUNING PARAMETERS

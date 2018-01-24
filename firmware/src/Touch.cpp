@@ -8,17 +8,21 @@ Touch::Touch()
         : SensorReader("touch", &currTouched)
 {}
 
-int Touch::init(){
-//
+bool Touch::init(){
     // Default address is 0x5A, if tied to 3.3V its 0x5B
     // If tied to SDA its 0x5C and if SCL then 0x5D
-    if (!cap.begin(0x5A)) {     //TODO: THIS LINE IS CAUSING PROGRAM TO HANG
-        Serial.println("MPR121 not found, check wiring?");
-        return -1;
+
+    //first check if MPR121 is plugged in
+    Wire.beginTransmission(0x5A);
+    uint8_t error = Wire.endTransmission();
+
+    if (error == 0){ //success, initialize MPR121
+        cap.begin(0x5A);
+        return true;
+
     }
-    else{
-        Serial.println("MPR121 found!");
-        return 0;
+    else{  //unknown error, return failure
+        return false;
     }
 }
 
@@ -29,6 +33,7 @@ void Touch::publish(ros::NodeHandle &nh){
 
 bool Touch::getTouched(int pinNum){
     touchData = cap.touched();
+    //touchData is a 12 bit number, shift touchData by the pin number
     if ((touchData >> pinNum) & 0x1){
         return true;
     }

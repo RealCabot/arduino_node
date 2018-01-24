@@ -16,7 +16,7 @@ class Touch : public SensorReader{
 
 public:
     Touch();
-    int init();
+    bool init();
     void publish(ros::NodeHandle &nh);
     bool getTouched(int pinNum);
 };
