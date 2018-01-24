@@ -13,6 +13,7 @@ Timer t;
 const int PID_DELAY = 1000 / PID_FREQ;
 const int SENSOR_DELAY = 1000 / ENCODER_FREQ;
 const int MOTOR_DELAY = 200; //used in motor timeout
+const int TOUCH_PIN = 5; //pin that touch pad is connected to on MPR121
 
 #define MOTOR_TIMEOUT 5000  //milliseconds
 
@@ -27,8 +28,9 @@ const int MOTOR_DELAY = 200; //used in motor timeout
 #define MOTOR_LEFT_PIN_A   10
 #define MOTOR_LEFT_PIN_B   11
 #define LED_PIN 13
-#define CABOT_WIDTH 0.225
+#define CABOT_WIDTH 0.225 //in meters
 
+bool canGo = false;
 float speed_req_R = 0;
 float speed_req_L = 0;
 long motorUpdateTime = 0;
@@ -54,7 +56,7 @@ void motorControl();
 void encoders_publish();
 void setMotorSpeed(const geometry_msgs::Twist& twist_msg);
 void setPIDParam(const geometry_msgs::Vector3& pid_param_msg);
-void motorTimeout();
+void checkMotors();
 
 arduino_msg::Motor speed_msg;
 ros::Publisher encoder_publisher("encoder", &speed_msg);
@@ -96,7 +98,7 @@ void setup()
   t.every(SENSOR_DELAY, updateSensors);
   t.every(HEARTBEAT_CYCLE, heartbeat);
   t.every(PID_DELAY, motorControl);
-  t.every(MOTOR_DELAY, motorTimeout);
+  t.every(MOTOR_DELAY, checkMotors);
 
 }
 
@@ -116,7 +118,7 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
-  touchReader.update();
+  //touchReader.update();
   encoders_publish();
   myIMUReader.publish(nh);
   touchReader.publish(nh);
@@ -149,20 +151,32 @@ void encoders_publish(){
 // }
 
 void setMotorSpeed(const geometry_msgs::Twist& twist_msg){
-  //constrain motor speeds
-  speed_req_L = twist_msg.linear.x - (twist_msg.angular.z * CABOT_WIDTH/2);
-  speed_req_R = twist_msg.linear.x + (twist_msg.angular.z * CABOT_WIDTH/2);
+  //constrain motor speeds, and only change speed if user is touching handle, and motor commands haven't timed out
+  if (canGo){
+    speed_req_L = twist_msg.linear.x - (twist_msg.angular.z * CABOT_WIDTH/2);
+    speed_req_R = twist_msg.linear.x + (twist_msg.angular.z * CABOT_WIDTH/2);
+  }
   motorUpdateTime = millis();  //record last time motors received speeds
-
 }
 
+//stop CaBot if user lets go of handle or if Arduino hasn't received command in a while
+void checkMotors(){
+  bool isTouched = touchReader.getTouched(TOUCH_PIN);   //is user touching handle?
+  bool timeOut = (millis() - motorUpdateTime) > MOTOR_TIMEOUT; //have motors received command recently?
 
- // stop motors if it has been a while since receiving a motor command
-void motorTimeout(){
-  if ((millis() - motorUpdateTime) > MOTOR_TIMEOUT){
+  canGo = isTouched && !timeOut;
+  if (!canGo){  //we should stop CaBot
     speed_req_R = 0;
     speed_req_L = 0;
   }
+
+  if (isTouched){
+    nh.loginfo("TOUCHED");
+  }
+  else{
+    nh.loginfo("RELEASED");
+  }
+
 }
 
  // this callback sets PID coefficient. ONLY USED IN TUNING PARAMETERS

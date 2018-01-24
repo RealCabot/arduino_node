@@ -22,11 +22,15 @@ int Touch::init(){
     }
 }
 
-void Touch::update(){
-    // Get the currently touched pads
-    currTouched.data = cap.touched();
+void Touch::publish(ros::NodeHandle &nh){
+    currTouched.data = touchData;
+    this->pub.publish( &currTouched );
 }
 
-void Touch::publish(ros::NodeHandle &nh){
-    this->pub.publish( &currTouched );
+bool Touch::getTouched(int pinNum){
+    touchData = cap.touched();
+    if ((touchData >> pinNum) & 0x1){
+        return true;
+    }
+    return false;
 }
