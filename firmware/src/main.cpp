@@ -30,6 +30,7 @@ const int TOUCH_PIN = 5; //pin that touch pad is connected to on MPR121
 #define LED_PIN 13
 #define CABOT_WIDTH 0.225 //in meters
 
+int isTeleoped; // 1 if is remote control, 0 otherwise 
 bool touchPresent = false;  //true if MPR121 is detected
 bool canGo = false;
 float speed_req_R = 0;
@@ -84,6 +85,11 @@ void setup()
   pinMode(LED_PIN, OUTPUT);
 
   while(!nh.connected()) {nh.spinOnce();}
+
+  if (! nh.getParam("~isTeleoped", &isTeleoped)){ 
+      //default values
+      isTeleoped = 0; 
+  }
 
   myIMUReader.realInit();
 
@@ -144,6 +150,7 @@ void encoders_publish(){
  // subscribes to rostopic "motorSpeed"
 void setMotorSpeed(const geometry_msgs::Twist& twist_msg){
   //constrain motor speeds, and only change speed if user is touching handle, and motor commands haven't timed out
+  // nh.loginfo("Set Motor Speed");
   if (canGo){
     speed_req_L = twist_msg.linear.x - (twist_msg.angular.z * CABOT_WIDTH/2);
     speed_req_R = twist_msg.linear.x + (twist_msg.angular.z * CABOT_WIDTH/2);
@@ -156,7 +163,9 @@ void checkMotors(){
   bool isTouched = (touchPresent) ? touchReader.getTouched(TOUCH_PIN) : false;   //is user touching handle?
   bool timeOut = (millis() - motorUpdateTime) > MOTOR_TIMEOUT; //have motors received command recently?
 
-  canGo = isTouched && !timeOut;
+  canGo = (!isTeleoped && isTouched && !timeOut) || isTeleoped;
+  // nh.loginfo(canGo?"Cabot can go":"Cabot CANNOT go");
+
   if (!canGo){  //we should stop CaBot
     speed_req_R = 0;
     speed_req_L = 0;
