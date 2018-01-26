@@ -114,8 +114,8 @@ void loop()
 }
 
 void motorControl(){
-  motor_L.go(speed_req_L);
-  motor_R.go(speed_req_R);
+  motor_L.go(speed_req_L, nh);
+  motor_R.go(speed_req_R, nh);
 }
 
 void updateSensors()
@@ -150,11 +150,14 @@ void encoders_publish(){
  // subscribes to rostopic "motorSpeed"
 void setMotorSpeed(const geometry_msgs::Twist& twist_msg){
   //constrain motor speeds, and only change speed if user is touching handle, and motor commands haven't timed out
-  // nh.loginfo("Set Motor Speed");
   if (canGo){
     speed_req_L = twist_msg.linear.x - (twist_msg.angular.z * CABOT_WIDTH/2);
     speed_req_R = twist_msg.linear.x + (twist_msg.angular.z * CABOT_WIDTH/2);
   }
+  // char logStr[40];
+  // sprintf (logStr, "Set Motor Speed: %d, %d", (int)(speed_req_L*100), (int)(speed_req_R*100));
+  // nh.loginfo(logStr);
+
   motorUpdateTime = millis();  //record last time motors received speeds
 }
 

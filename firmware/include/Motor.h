@@ -16,7 +16,7 @@ public:
         short encoder_pinA, short encoder_pinB,
         int Kp, int Ki, int Kd
     );
-    void go(float desiredSpeed);
+    void go(float desiredSpeed, ros::NodeHandle &nh);
 };
 
 #endif //ARDUINO_NODE_MOTOR_H
