@@ -32,6 +32,7 @@ const int TOUCH_PIN = 5; //pin that touch pad is connected to on MPR121
 
 int isTeleoped; // 1 if is remote control, 0 otherwise 
 bool touchPresent = false;  //true if MPR121 is detected
+bool prevTouched = false;
 bool canGo = false;
 float speed_req_R = 0;
 float speed_req_L = 0;
@@ -174,7 +175,7 @@ void checkMotors(){
     speed_req_L = 0;
   }
 
-  if (touchPresent){
+  if (touchPresent && prevTouched!=isTouched){
     if (isTouched){
       nh.loginfo("TOUCHED");
     }
@@ -182,6 +183,8 @@ void checkMotors(){
       nh.loginfo("RELEASED");
     }
   }
+
+  prevTouched = isTouched;
 }
 
  // this callback sets PID coefficient. ONLY USED IN TUNING PARAMETERS
