@@ -124,12 +124,12 @@ void updateSensors()
   motor_L.encoder.update();
   motor_R.encoder.update();
   myIMUReader.update();
+  nh.spinOnce();
   encoders_publish();
   myIMUReader.publish(nh);
 //  if (touchPresent){
 //    touchReader.publish(nh);
 //  }
-  nh.spinOnce();
 }
 
  // blink LED periodically to indicate everything's gonna be alright
