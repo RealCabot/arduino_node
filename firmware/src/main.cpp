@@ -28,7 +28,7 @@ const int TOUCH_PIN = 5; //pin that touch pad is connected to on MPR121
 #define MOTOR_LEFT_PIN_A   10
 #define MOTOR_LEFT_PIN_B   11
 #define LED_PIN 13
-#define CABOT_WIDTH 0.225 //in meters
+#define WHEELS_SEPERATION 0.125 //in meters
 
 int isTeleoped; // 1 if is remote control, 0 otherwise 
 bool touchPresent = false;  //true if MPR121 is detected
@@ -152,8 +152,8 @@ void encoders_publish(){
 void setMotorSpeed(const geometry_msgs::Twist& twist_msg){
   //constrain motor speeds, and only change speed if user is touching handle, and motor commands haven't timed out
   if (canGo){
-    speed_req_L = twist_msg.linear.x - (twist_msg.angular.z * CABOT_WIDTH/2);
-    speed_req_R = twist_msg.linear.x + (twist_msg.angular.z * CABOT_WIDTH/2);
+    speed_req_L = twist_msg.linear.x - (twist_msg.angular.z * WHEELS_SEPERATION/2);
+    speed_req_R = twist_msg.linear.x + (twist_msg.angular.z * WHEELS_SEPERATION/2);
   }
   // char logStr[40];
   // sprintf (logStr, "Set Motor Speed: %d, %d", (int)(speed_req_L*100), (int)(speed_req_R*100));
