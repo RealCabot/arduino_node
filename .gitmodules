@@ -10,3 +10,6 @@
 [submodule "firmware/Libraries/Adafruit_Sensor"]
 	path = firmware/Libraries/Adafruit_Sensor
 	url = git@github.com:adafruit/Adafruit_Sensor.git
+[submodule "firmware/Libraries/Adafruit_MPR121"]
+	path = firmware/Libraries/Adafruit_MPR121
+	url = https://github.com/adafruit/Adafruit_MPR121

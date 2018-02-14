@@ -23,9 +23,9 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
     //calc error
     float error = desiredSpeed - currSpeed;
 
-        char cstr[50];
-        char d_str[6];
-        char curr_str[6];
+        // char cstr[50];
+        // char d_str[6];
+        // char curr_str[6];
 
         /* 4 is mininum width, 2 is precision; float value is copied onto str_temp*/
         // dtostrf(desiredSpeed, 4, 2, d_str);
@@ -34,9 +34,9 @@ int PID::getPWM(float desiredSpeed, float currSpeed){
         // nh.loginfo(cstr);
 
     //accumulate error in integral
-    if (!(desiredSpeed > 0 && abs(currSpeed)<0.001)){
+    // if (!(desiredSpeed > 0 && abs(currSpeed)<0.001)){
         integral += error;
-    }
+    // }
     integral = constrain(integral, -MAX_I, MAX_I);
 
     float derivative = error - lastError;
