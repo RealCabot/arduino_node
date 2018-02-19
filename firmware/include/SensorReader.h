@@ -4,6 +4,8 @@
 #include <ros.h>
 #include <Arduino.h>
 
+#define ENCODER_FREQ 20 // How many times in a second
+
 class SensorReader {
 protected:
     ros::Publisher pub;
