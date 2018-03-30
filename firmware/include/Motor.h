@@ -4,6 +4,7 @@
 #include "PID.h"
 #include "Arduino.h"
 #include "EncoderReader.h"
+#include <Servo.h>
 
 class Motor {
     short pinA;
@@ -11,6 +12,7 @@ class Motor {
 public:
     PID pid;
     EncoderReader encoder;        
+    Servo mot;
     Motor(
         short motor_pinA, short motor_pinB,
         short encoder_pinA, short encoder_pinB,

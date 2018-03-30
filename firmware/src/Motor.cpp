@@ -14,15 +14,17 @@ void Motor::go(float desiredSpeed, ros::NodeHandle &nh){
     auto actual_speed = this->encoder.speed;
     auto PWM_val = this->pid.getPWM(desiredSpeed, actual_speed);
     
-    char logStr[60];
+    //char logStr[60];
     // sprintf (logStr, "Actual PWM: %d, desiredSpeed: %d, actual_speed: %d", PWM_val, (int)(desiredSpeed*100), (int)(actual_speed*100));
     // nh.loginfo(logStr);
 
     if (desiredSpeed < 0){
-      analogWrite(pinA, 0);
-      analogWrite(pinB, PWM_val);
+      // analogWrite(pinA, 0);
+      // analogWrite(pinB, PWM_val);
+    	mot.write(90-PWM_val);
     } else {
-      analogWrite(pinA, PWM_val);
-      analogWrite(pinB, 0);
+      // analogWrite(pinA, PWM_val);
+      // analogWrite(pinB, 0);
+    	mot.write(90+PWM_val);
     }
 }
