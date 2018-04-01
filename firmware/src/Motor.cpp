@@ -14,7 +14,7 @@ void Motor::go(float desiredSpeed, ros::NodeHandle &nh){
     auto actual_speed = this->encoder.speed;
     auto PWM_val = this->pid.getPWM(desiredSpeed, actual_speed);
     
-    char logStr[60];
+    // char logStr[60];
     // sprintf (logStr, "Actual PWM: %d, desiredSpeed: %d, actual_speed: %d", PWM_val, (int)(desiredSpeed*100), (int)(actual_speed*100));
     // nh.loginfo(logStr);
 

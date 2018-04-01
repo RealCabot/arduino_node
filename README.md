@@ -25,7 +25,7 @@ catkin_make arduino_node_firmware_oneForAll-upload
     - `/motorSpeed`: set the motor desired speed.
         - You can publish in terminal like this: `rostopic pub /cmd_vel geometry_msgs/Twist '[0.2, 0, 0]' '[0, 0, 0]' -1`
     - `/tunePID`: set `Kp`, `Ki` and `Kd`
-        - You can publish in terminal like this: `rostopic pub /tunePID geometry_msgs/Vector3 '{x: 10, y: 5, z: 10}' -1`
+        - You can publish in terminal like this: `rostopic pub /tunePID_L geometry_msgs/Vector3 '{x: 10, y: 5, z: 10}' -1`
 
 ### Install dependencies
 

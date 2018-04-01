@@ -58,15 +58,16 @@ void updateSensors();
 void motorControl();
 void encoders_publish();
 void setMotorSpeed(const geometry_msgs::Twist& twist_msg);
-void setPIDParam(const geometry_msgs::Vector3& pid_param_msg);
+void setPIDParamL(const geometry_msgs::Vector3& pid_param_msg);
+void setPIDParamR(const geometry_msgs::Vector3& pid_param_msg);
 void checkMotors();
 
 arduino_msg::Motor speed_msg;
 ros::Publisher encoder_publisher("encoder", &speed_msg);
 //ros::Subscriber<arduino_msg::Motor> motor_speed_sub("motorSpeed", &setMotorSpeed);
 ros::Subscriber<geometry_msgs::Twist> motor_twist_sub("cmd_vel", &setMotorSpeed);
-ros::Subscriber<geometry_msgs::Vector3> pid_param_sub("tunePID", &setPIDParam);
-
+ros::Subscriber<geometry_msgs::Vector3> pid_param_sub_L("tunePID_L", &setPIDParamL);
+ros::Subscriber<geometry_msgs::Vector3> pid_param_sub_R("tunePID_R", &setPIDParamR);
 
 void setup()
 {
@@ -77,7 +78,8 @@ void setup()
   nh.advertise(encoder_publisher);
   nh.advertise(myIMUReader.get_publisher());
   nh.subscribe(motor_twist_sub);
-  nh.subscribe(pid_param_sub);
+  nh.subscribe(pid_param_sub_L);
+  nh.subscribe(pid_param_sub_R);
   //motor settings
   pinMode(MOTOR_RIGHT_PIN_A, OUTPUT);
   pinMode(MOTOR_RIGHT_PIN_B, OUTPUT);
@@ -188,8 +190,13 @@ void checkMotors(){
 }
 
  // this callback sets PID coefficient. ONLY USED IN TUNING PARAMETERS
-void setPIDParam(const geometry_msgs::Vector3& pid_param_msg){
+void setPIDParamL(const geometry_msgs::Vector3& pid_param_msg){
   // X = proportional term, Y = integral term, Z = derivative term
   motor_L.pid.setParam(pid_param_msg.x, pid_param_msg.y, pid_param_msg.z);
+}
+
+ // this callback sets PID coefficient. ONLY USED IN TUNING PARAMETERS
+void setPIDParamR(const geometry_msgs::Vector3& pid_param_msg){
+  // X = proportional term, Y = integral term, Z = derivative term
   motor_R.pid.setParam(pid_param_msg.x, pid_param_msg.y, pid_param_msg.z);
 }
