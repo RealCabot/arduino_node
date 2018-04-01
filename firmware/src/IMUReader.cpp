@@ -28,9 +28,11 @@ void IMUReader::update(){
     sensors_event_t event;
     this->imu.getEvent(&event);
     //apply coordinate transform: pi - theta
-    euler_msg.vector.x = 360 - angle_constrain(event.orientation.x); 
-    euler_msg.vector.y = event.orientation.y;
-    euler_msg.vector.z = event.orientation.z;
+    float previous_angle = euler_msg.vector.x;
+    euler_msg.vector.x = angle_constrain(360 - event.orientation.x); //in degree
+    float angular_velocity = angle_constrain(euler_msg.vector.x - previous_angle) * ENCODER_FREQ * 71 / 4068; // in rad/s
+    euler_msg.vector.y = angular_velocity;
+    euler_msg.vector.z = 0;
 }
 
 void IMUReader::publish(ros::NodeHandle &nh){

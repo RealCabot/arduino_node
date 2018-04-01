@@ -28,7 +28,7 @@ void Motor::go(float desiredSpeed, ros::NodeHandle &nh){
     } else {
     	writePWM = 90+PWM_val;
     }    
-    // writePWM = 110;
+
     mot.write(writePWM);
 
     //print statements for debugging
