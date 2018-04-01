@@ -8,16 +8,17 @@
 
 class Motor {
     short pinA;
-    short pinB;
+    //short pinB; //Sabertooth only needs 1 pin per motor
 public:
     PID pid;
     EncoderReader encoder;        
-    Servo mot;
+    Servo mot; //use servo.write to drive motors
     Motor(
-        short motor_pinA, short motor_pinB,
+        short motor_pinA,
         short encoder_pinA, short encoder_pinB,
         int Kp, int Ki, int Kd
     );
+    void init();
     void go(float desiredSpeed, ros::NodeHandle &nh);
 };
 
