@@ -23,10 +23,10 @@ const int TOUCH_PIN = 5; //pin that touch pad is connected to on MPR121
 #define ENCODER_RIGHT_PIN_B 19
 #define ENCODER_LEFT_PIN_A  2
 #define ENCODER_LEFT_PIN_B  3
-#define MOTOR_RIGHT_PIN_A  6
-#define MOTOR_RIGHT_PIN_B  5
-#define MOTOR_LEFT_PIN_A   10
-#define MOTOR_LEFT_PIN_B   11
+//#define MOTOR_RIGHT_PIN_A  6 
+#define MOTOR_RIGHT  6 // changed for Sabertooth motordriver
+// #define MOTOR_LEFT_PIN_A   10
+#define MOTOR_LEFT   5  //originally 11, changed for Sabertooth motordriver
 #define LED_PIN 13
 #define WHEELS_SEPERATION 0.125 //in meters
 
@@ -38,15 +38,15 @@ float speed_req_R = 0;
 float speed_req_L = 0;
 long motorUpdateTime = 0;
 //PID coefficients
-const int RKp=35, RKi=16, RKd=15, LKp=35, LKi=16, LKd=15;
+const int RKp=12, RKi=6, RKd=7, LKp=12, LKi=6, LKd=7;
 
 Motor motor_L(
-  MOTOR_LEFT_PIN_A, MOTOR_LEFT_PIN_B,
+  MOTOR_LEFT,
   ENCODER_LEFT_PIN_A, ENCODER_LEFT_PIN_B,
   LKp, LKi, LKd
 );
 Motor motor_R(
-  MOTOR_RIGHT_PIN_A, MOTOR_RIGHT_PIN_B,
+  MOTOR_RIGHT,
   ENCODER_RIGHT_PIN_A, ENCODER_RIGHT_PIN_B,
   RKp, RKi, RKd
 );
@@ -81,11 +81,14 @@ void setup()
   nh.subscribe(pid_param_sub_L);
   nh.subscribe(pid_param_sub_R);
   //motor settings
-  pinMode(MOTOR_RIGHT_PIN_A, OUTPUT);
-  pinMode(MOTOR_RIGHT_PIN_B, OUTPUT);
-  pinMode(MOTOR_LEFT_PIN_A, OUTPUT);
-  pinMode(MOTOR_LEFT_PIN_B, OUTPUT);
+  // pinMode(MOTOR_RIGHT_PIN_A, OUTPUT);
+  // pinMode(MOTOR_RIGHT, OUTPUT);
+  // pinMode(MOTOR_LEFT_PIN_A, OUTPUT);
+  // pinMode(MOTOR_LEFT, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
+
+  motor_L.init();
+  motor_R.init();
 
   while(!nh.connected()) {nh.spinOnce();}
 
