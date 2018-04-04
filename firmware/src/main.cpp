@@ -19,14 +19,14 @@ const int TOUCH_PIN = 5; //pin that touch pad is connected to on MPR121
 
 #define HEARTBEAT_CYCLE 500
 
-#define ENCODER_RIGHT_PIN_A 18
-#define ENCODER_RIGHT_PIN_B 19
-#define ENCODER_LEFT_PIN_A  2
-#define ENCODER_LEFT_PIN_B  3
+#define ENCODER_RIGHT_PIN_A 19
+#define ENCODER_RIGHT_PIN_B 18
+#define ENCODER_LEFT_PIN_A  3
+#define ENCODER_LEFT_PIN_B  2
 //#define MOTOR_RIGHT_PIN_A  6 
-#define MOTOR_RIGHT  6 // changed for Sabertooth motordriver
+#define MOTOR_RIGHT  5 // changed for Sabertooth motordriver
 // #define MOTOR_LEFT_PIN_A   10
-#define MOTOR_LEFT   5  //originally 11, changed for Sabertooth motordriver
+#define MOTOR_LEFT   6  //originally 11, changed for Sabertooth motordriver
 #define LED_PIN 13
 #define WHEELS_SEPERATION 0.125 //in meters
 
