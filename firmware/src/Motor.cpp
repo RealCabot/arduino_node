@@ -8,7 +8,6 @@ Motor::Motor(
     : pinA(motor_pinA), //pinB(motor_pinB), 
     encoder(encoder_pinA, encoder_pinB),
     pid(Kp, Ki, Kd)
-
 {}
 
 //attach servo object to provided pin
@@ -30,10 +29,9 @@ void Motor::go(float desiredSpeed, ros::NodeHandle &nh){
     }    
 
     mot.write(writePWM);
+}
 
-    //print statements for debugging
-    // char logStr[85];
-    // sprintf (logStr, "Pin: %d Actual PWM: %d Written PWM: %d, desiredSpeed: %d, actual_speed: %d", pinA, PWM_val, writePWM, (int)(desiredSpeed*100), (int)(actual_speed*100));
-    // nh.loginfo(logStr);
-
+void Motor::reset(){
+    pid.reset();
+    encoder.reset();
 }

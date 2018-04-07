@@ -14,6 +14,7 @@ public:
         :pub(topic_name, msg)
     {}
     virtual void publish(ros::NodeHandle &nh)=0;
+    virtual void reset()=0;
     ros::Publisher& get_publisher(){return pub;}
 };
 

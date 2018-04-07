@@ -11,12 +11,13 @@
 
 class PID {
     int Kp, Ki, Kd;
-    float integral = 0;
-    float lastError = 0;
+    float integral_ = 0;
+    float lastError_ = 0;
 public:
     PID(int Kp, int Ki, int Kd);
     int getPWM(float desiredSpeed, float currSpeed);
     void setParam(int Kp, int Ki, int Kd);
+    void reset();
 };
 
 

@@ -39,3 +39,5 @@ bool Touch::getTouched(int pinNum){
     }
     return false;
 }
+
+void Touch::reset(){}

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(arduino_node)
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --Wno-dev" )
+
 find_package(catkin REQUIRED COMPONENTS
   rosserial_arduino
   rosserial_client

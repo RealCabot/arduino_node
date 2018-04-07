@@ -19,6 +19,7 @@ public:
     bool init();
     void publish(ros::NodeHandle &nh);
     bool getTouched(int pinNum);
+    void reset();
 };
 
 #endif //ARDUINO_NODE_TOUCH_H

@@ -7,12 +7,11 @@ EncoderReader::EncoderReader(short pinA, short pinB)
 
 void EncoderReader::update(){
     long newPosition = myEnc.read();
-    this->speed = float(newPosition - oldPosition) / TICK_PER_METER * ENCODER_FREQ; // m/s
+    this->speed = float(newPosition - oldPosition_) / TICK_PER_METER * ENCODER_FREQ; // m/s
     if (newPosition < RESET_THRESHOLD){
-        oldPosition = newPosition;
+        oldPosition_ = newPosition;
     } else { // Reset the counter
-        myEnc.write(0);
-        oldPosition = 0;
+        this->reset();
     }
 }
 
@@ -23,3 +22,7 @@ void EncoderReader::publish(ros::NodeHandle &nh){
     this->pub.publish( &encoder_msg );
 }
 
+void EncoderReader::reset(){
+    myEnc.write(0);
+    oldPosition_ = 0;
+}

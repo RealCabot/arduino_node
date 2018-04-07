@@ -20,6 +20,7 @@ public:
     );
     void init();
     void go(float desiredSpeed, ros::NodeHandle &nh);
+    void reset();
 };
 
 #endif //ARDUINO_NODE_MOTOR_H

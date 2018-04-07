@@ -22,10 +22,11 @@ catkin_make arduino_node_firmware_oneForAll-upload
     - `/encoder`: the speed information of motor, using `arduino_msg::Motor`
     - `/imu`: absolute pose information, using `geometry_msg::Vector3Stamped`
 - Subscribed:
-    - `/cmd_vel`: set the motor desired speed.
+    - `/cmd_vel`: `geometry_msgs::Twist`, set the motor desired speed.
         - You can publish in terminal like this: `rostopic pub /cmd_vel geometry_msgs/Twist '[0.2, 0, 0]' '[0, 0, 0]' -l`
-    - `/tunePID`: set `Kp`, `Ki` and `Kd`
+    - `/tunePID_L` and `/tunePID_R`: `geometry_msgs::Vector3`, set `Kp`, `Ki` and `Kd`
         - You can publish in terminal like this: `rostopic pub /tunePID_L geometry_msgs/Vector3 '{x: 10, y: 5, z: 10}' -1`
+    - `/reset_arduino`: `std_msgs::Bool`, reset Arduino
 
 ### Install dependencies
 
